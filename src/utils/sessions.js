@@ -7,9 +7,9 @@
  * @param    {String/object}   value 键值
  */
 export function setSessionStorage (key, value) {
-  if(typeof value === 'object') {
-    sessionStorage.setItem(key, JSON.stringify(value));
-  }else {
+  if (typeof value === 'object') {
+    sessionStorage.setItem(key, JSON.stringify(value))
+  } else {
     sessionStorage.setItem(key, value)
   }
 }
@@ -20,7 +20,7 @@ export function setSessionStorage (key, value) {
  * @param    {String}   key   键值名
  */
 export function getSessionStorage (key) {
-  return JSON.parse(sessionStorage.getItem(key));
+  return JSON.parse(sessionStorage.getItem(key))
 }
 
 /**
@@ -29,13 +29,13 @@ export function getSessionStorage (key) {
  * @param    {String}   key   键值名
  */
 export function removeSessionStorage (key) {
-  sessionStorage.removeItem(key);
+  sessionStorage.removeItem(key)
 }
 
 /**
  * 清空sessionStorage
  * @DateTime 2018-10-25
  */
-export function initialSessionStorage() {
-  sessionStorage.clear();
+export function initialSessionStorage () {
+  sessionStorage.clear()
 }

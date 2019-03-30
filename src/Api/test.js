@@ -1,8 +1,8 @@
-import request from "../utils/request"
+import request from '_utils/request.js'
 
-export function test() {
-  return request({
-    url: '/v2/movie/in_theaters',
-    method: 'get',
-  })
+export function getInTheater() {
+    return request({
+        url: '/movie/in_theaters',
+        method: 'get'
+    })
 }

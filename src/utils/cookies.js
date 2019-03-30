@@ -7,8 +7,8 @@ import Cookies from 'js-cookie'
  * @param    {String}   name  键值名
  * @param    {String/Json}   key   键值
  */
-export function setCookie(name, key) {
-  return Cookies.set(name, key);
+export function setCookie (name, key) {
+  return Cookies.set(name, key)
 }
 
 /**
@@ -16,8 +16,8 @@ export function setCookie(name, key) {
  * @DateTime 2018-10-26
  * @param    {String}   name  键值名
  */
-export function getCookie(name) {
-  return Cookies.getJSON(name);
+export function getCookie (name) {
+  return Cookies.getJSON(name)
 }
 
 /**
@@ -25,7 +25,7 @@ export function getCookie(name) {
  * @DateTime 2018-10-26
  * @param    {String}   name  键值名
  */
-export function removeCookie(name) {
+export function removeCookie (name) {
   return Cookies.remove(name)
 }
 
@@ -33,10 +33,10 @@ export function removeCookie(name) {
  * 清除本地所有cookie
  * @DateTime 2018-10-26
  */
-export function initialCookie() {
-  let allCookie = Cookies.get();
-  for(let key in allCookie) {
-    if(key !== null) {
+export function initialCookie () {
+  let allCookie = Cookies.get()
+  for (let key in allCookie) {
+    if (key !== null) {
       Cookies.remove(key)
     }
   }

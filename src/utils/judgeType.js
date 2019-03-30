@@ -1,6 +1,5 @@
 // 判断数据类型
-const oproto = Object.prototype.toString;
-
+const oproto = Object.prototype.toString
 
 const dataType = {
   /**
@@ -9,7 +8,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isUndefined: function(obj) {
+  isUndefined: function (obj) {
     return typeof obj === 'undefined'
   },
   /**
@@ -18,7 +17,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isNumber: function(obj) {
+  isNumber: function (obj) {
     return typeof obj === 'number'
   },
   /**
@@ -27,7 +26,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isString: function(obj) {
+  isString: function (obj) {
     return typeof obj === 'string'
   },
   /**
@@ -36,7 +35,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isBoolean: function(obj) {
+  isBoolean: function (obj) {
     return typeof obj === 'boolean'
   },
   /**
@@ -45,7 +44,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isNull: function(obj) {
+  isNull: function (obj) {
     return obj === null
   },
   /**
@@ -54,7 +53,7 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isFunction: function(obj) {
+  isFunction: function (obj) {
     return typeof obj === 'function'
   },
   /**
@@ -63,8 +62,8 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isArray: function(obj) {
-    return Array.isArray ? Array.isArray(obj) : oproto.call(obj) == "[object Array]";
+  isArray: function (obj) {
+    return Array.isArray ? Array.isArray(obj) : oproto.call(obj) == '[object Array]'
   },
   /**
    * 是否是 isObject类型
@@ -72,8 +71,8 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isObject: function(obj) {
-    return oproto.call(obj) == "[object Object]"
+  isObject: function (obj) {
+    return oproto.call(obj) == '[object Object]'
   },
   /**
    * 是否是 Date类型
@@ -81,8 +80,8 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isDate: function(obj) {
-    return oproto.call(obj) == "[object Date]"
+  isDate: function (obj) {
+    return oproto.call(obj) == '[object Date]'
   },
   /**
    * 是否是 RexExp类型
@@ -90,9 +89,9 @@ const dataType = {
    * @param   obj   待检测的数据
    * @return   {Boolean}  布尔值
    */
-  isRegExp: function(obj) {
-    return oproto.call(obj) == "[object RegExp]"
+  isRegExp: function (obj) {
+    return oproto.call(obj) == '[object RegExp]'
   }
 }
 
-export default dataType;
+export default dataType
