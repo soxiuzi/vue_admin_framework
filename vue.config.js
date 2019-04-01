@@ -60,20 +60,8 @@ module.exports = {
     host: '0.0.0.0', // 指定一个host，默认是localhost
     port: 8080, // 端口地址
     https: false, // 使用https服务
-    proxy: {
-      '/api': {
-        target: 'https://api.douban.com',
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          '^/api': ''
-        }
-      }
-    }, // string | object 代理设置
     // 提供在服务器内部的其他中间件之前执行自定义中间件的能力
-    before: app => {
-
-    }
+    before: app => {}
   },
   // 第三方插件配置
   pluginOptions: {}

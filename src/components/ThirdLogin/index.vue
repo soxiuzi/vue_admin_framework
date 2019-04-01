@@ -1,5 +1,6 @@
 <template>
   <div class="third_login">
+    <span>第三方登录：</span>
     <div v-for="(svg, index) in loginMethod" :key="index">
       <div
         class="login_method"

@@ -22,7 +22,7 @@
           <a-menu-item key="2">
             <router-link :to="{ name: 'coursemanage' }">
               <a-icon type="database" />
-              <span>课程管理</span>
+              <span>专业管理</span>
             </router-link>
           </a-menu-item>
           <a-menu-item key="3">
@@ -34,7 +34,7 @@
           <a-menu-item key="4">
             <router-link :to="{ name: 'grademanage' }">
               <a-icon type="pie-chart" />
-              <span>年级管理</span>
+              <span>课程管理</span>
             </router-link>
           </a-menu-item>
           <a-sub-menu key="sub1">
@@ -121,7 +121,6 @@
 import { PAGEBREAD } from "@/var/pageBread.js";
 import Header from "_com/Header";
 import { setTimeout } from "timers";
-import { truncate, constants } from "fs";
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: { Header },
@@ -164,8 +163,9 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.currentPath = this.$route.path;
-    console.log("当前路由：", this.currentPath);
+    // console.log('获取token：', this.$store.getter)
+    // this.currentPath = this.$route.path;
+    // console.log("当前路由：", this.currentPath);
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {

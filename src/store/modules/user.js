@@ -25,11 +25,11 @@ const user = {
         LoginByUsername({ commit }, userInfo) {
             const username = userInfo.username.trim()
             return new Promise((resolve, reject) => {
-                loginByUserName(username. userInfo.password).then(res => {
-                    const data = res.data
+                loginByUserName(username, userInfo.password).then(res => {
+                    const data = res.data.data
                     commit('SET_TOKEN', data.token)
-                    setLocalStorage('token', data.token)
-                    resolve()
+                    setLocalStorage('token', data.token, 3)
+                    resolve(data)
                 }).catch(err => {
                     reject(err)
                 })

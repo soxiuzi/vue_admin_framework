@@ -5,13 +5,13 @@
         <span class="title">账户登录</span>
         <a-form>
           <a-form-item :label-col="labelCol" :wrapper-col="wrapperCol" label="用户名：">
-            <a-input placeholder="请输入用户名"></a-input>
+            <a-input v-model="userInfo.username" placeholder="请输入用户名"></a-input>
           </a-form-item>
           <a-form-item :label-col="labelCol" :wrapper-col="wrapperCol" label="密码：">
-            <a-input placeholder="请输入密码"></a-input>
+            <a-input type="password" v-model="userInfo.password" placeholder="请输入密码"></a-input>
           </a-form-item>
-          <third-login></third-login>
           <a-button :size="btnSize" type="primary" class="login_btn" @click="login">登录</a-button>
+          <third-login class="login_method"></third-login>
         </a-form>
       </a-layout-content>
     </a-layout>
@@ -22,6 +22,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import ThirdLogin from "_com/ThirdLogin";
+import { register, loginByUserName } from '_api/login'
 export default {
   //import引入的组件需要注入到对象中才能使用
   components: { ThirdLogin },
@@ -29,6 +30,10 @@ export default {
     //这里存放数据
     return {
       btnSize: "large",
+      userInfo: {
+        username: '', // 用户名
+        password: '', // 密码
+      },
       labelCol: {
         span: 4,
         offset: 6
@@ -45,9 +50,20 @@ export default {
   //方法集合
   methods: {
     login() {
-      this.$router.push({
-        name: "index"
-      });
+      // 注册
+      // register(this.username, this.password).then(res => {
+      //   console.log('注册结果：', res)
+      // })
+      // 登录
+      this.$store.dispatch('LoginByUsername', this.userInfo).then(res => {
+        res && this.$router.push({ name: "index" })
+      })
+      // loginByUserName(this.username, this.password).then(res => {
+      //   console.log('登录结果：', res)
+      // })
+      // this.$router.push({
+      //   name: "index"
+      // });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -84,6 +100,9 @@ export default {
   }
   .login_btn {
     margin-left: 240px;
+  }
+  .login_method {
+    margin-top: 20px;
   }
 }
 </style>

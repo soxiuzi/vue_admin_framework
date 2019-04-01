@@ -1,52 +1,22 @@
 <template>
-  <div class='tree_select'>
-    <a-directory-tree
-      multiple
-      defaultExpandAll
-      @select="onSelect"
-    >
-      <a-tree-node
-        title="学校系"
-        key="0-0"
-      >
-        <a-tree-node
-          title="leaf 0-0"
-          key="0-0-0"
-          isLeaf
-        />
-        <a-tree-node
-          title="leaf 0-1"
-          key="0-0-1"
-          isLeaf
-        />
-      </a-tree-node>
-      <a-tree-node
-        title="parent 1"
-        key="0-1"
-      >
-        <a-tree-node
-          title="leaf 1-0"
-          key="0-1-0"
-          isLeaf
-        />
-        <a-tree-node
-          title="leaf 1-1"
-          key="0-1-1"
-          isLeaf
-        />
-      </a-tree-node>
-    </a-directory-tree>
-  </div>
+  <a-tree @select="onSelect" :treeData="treeData" showIcon>
+    <svg-icon slot="dir" icon-class="menu"></svg-icon>
+    <svg-icon slot="major" icon-class="major"></svg-icon>
+  </a-tree>
 </template>
 
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
 export default {
-  name: 'TreeSelect',
+  name: "TreeControl",
   //import引入的组件需要注入到对象中才能使用
   components: {},
+  props: {
+    treeData: {
+      type: Array
+    }
+  },
   data() {
     //这里存放数据
     return {};
@@ -58,8 +28,8 @@ export default {
   //方法集合
   methods: {
     onSelect(keys) {
-      console.log("Trigger Select", keys);
-    },
+      this.$emit("select-key", keys);
+    }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},

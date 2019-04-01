@@ -3,3 +3,5 @@ const getters = {
     avatar: state => state.user.avatar,
     roles: state => state.user.roles
 }
+
+export default getters

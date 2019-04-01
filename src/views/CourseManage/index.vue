@@ -1,33 +1,14 @@
 <template>
   <div class="course_manage">
+    <a-modal title="添加课程" v-model="visible" centered okText="提交" cancelText="取消" @ok="addMajor">
+      <a-input v-model="addMajorInfo.parentId" placeholder="请输入专业父级ID"></a-input>
+      <a-input v-model="addMajorInfo.sort" placeholder="请输入排列顺序"></a-input>
+      <a-input v-model="addMajorInfo.professionalName" placeholder="请输入专业名称"></a-input>
+      <a-input v-model="addMajorInfo.professionalCode" placeholder="请输入专业码"></a-input>
+    </a-modal>
     <div class="choose_major">
       请先选择您的专业：
-      <a-tree @select="onSelect">
-        <a-tree-node key="xueyuan1">
-          <span slot="title" style="color: #1890ff">学院</span>
-          <a-tree-node title="院系" key="yuanxi1">
-            <a-tree-node title="专业1" key="major_1"/>
-            <a-tree-node title="专业2" key="major_2"/>
-            <a-tree-node title="专业3" key="major_3"/>
-          </a-tree-node>
-          <a-tree-node title="院系" key="yuanxi2">
-            <a-tree-node title="专业" key="major_4"/>
-            <a-tree-node title="专业" key="major_5"/>
-          </a-tree-node>
-        </a-tree-node>
-        <a-tree-node key="xueyuan2">
-          <span slot="title" style="color: #1890ff">学院</span>
-          <a-tree-node title="院系" key="yuanxi3">
-            <a-tree-node title="专业1" key="major_6"/>
-            <a-tree-node title="专业2" key="major_7"/>
-            <a-tree-node title="专业3" key="major_8"/>
-          </a-tree-node>
-          <a-tree-node title="院系" key="yuanxi4">
-            <a-tree-node title="专业" key="major_9"/>
-            <a-tree-node title="专业" key="major_10"/>
-          </a-tree-node>
-        </a-tree-node>
-      </a-tree>
+      <tree-control @select-key="onSelect" :tree-data="treeData"></tree-control>
     </div>
     <transition
       name="fade"
@@ -35,6 +16,12 @@
       leave-to-class="slideOutRight"
       mode="out-in"
     >
+      <div v-if="academyId" class="function academy animated">
+        <a-button @click="addMajor('academy')" size="large" type="primary">添加学院</a-button>
+      </div>
+      <div v-if="facultyId" class="function academy animated">
+        <a-button @click="addMajor('faculty')" size="large" type="primary">添加院系</a-button>
+      </div>
       <div v-if="gradeSelect" class="function animated">
         <div class="choose_grade">
           <span>选择年级：</span>
@@ -45,10 +32,11 @@
             style="width: 200px"
             @change="handleChange"
           >
-            <a-select-option value="firstClass">大一</a-select-option>
-            <a-select-option value="secondClass">大二</a-select-option>
-            <a-select-option value="thirdClass">大三</a-select-option>
-            <a-select-option value="fourClass">大四</a-select-option>
+            <a-select-option
+              v-for="(grade, index) in selectData"
+              :key="index"
+              :value="grade.id"
+            >{{ grade.gradeName }}</a-select-option>
           </a-select>
         </div>
         <div class="course_table">
@@ -81,18 +69,69 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import TreeSelect from "_com/TreeSelect";
 import { message } from "ant-design-vue";
-import { getInTheater } from '_api/test'
+import TreeControl from "_com/TreeControl/index.vue";
+import { getTreeData, addMajor, getGradeList } from "_api/CourseManage/index";
+
+const treeData = [
+  {
+    title: "学院1",
+    key: JSON.stringify({
+      type: "xueyuan",
+      value: "xueyuan1"
+    }),
+    slots: {
+      icon: "dir"
+    },
+    children: [
+      {
+        title: "院系1",
+        key: JSON.stringify({
+          type: "yuanxi",
+          value: "yuanxi1"
+        }),
+        slots: {
+          icon: "dir"
+        },
+        children: [
+          {
+            title: "专业1",
+            key: JSON.stringify({ type: "major", value: "major1" })
+          },
+          {
+            title: "专业2",
+            key: JSON.stringify({ type: "major", value: "major2" })
+          }
+        ]
+      },
+      {
+        title: "院系2",
+        key: "yuanxi2",
+        children: [{ key: "专业3" }]
+      }
+    ]
+  }
+];
 
 export default {
   //import引入的组件需要注入到对象中才能使用
-  components: { TreeSelect },
+  components: { TreeControl },
   data() {
     //这里存放数据
     return {
+      testData: "",
+      addMajorInfo: {
+        parentId: "",
+        sort: "",
+        professionalName: "",
+        professionalCode: ""
+      },
+      selectData: [], // 年级选择数据
+      visible: false,
       test: false,
       value: "",
+      academyId: "", // 学院Id
+      facultyId: "", // 院系Id
       major: "", // 专业
       gradeSelect: false, // 年级选择
       tableLoading: false,
@@ -100,6 +139,7 @@ export default {
         total: 4,
         pageSize: 2
       },
+      treeData: treeData,
       treeExpandedKeys: [],
       dataSource: [
         {
@@ -154,6 +194,19 @@ export default {
   },
   //方法集合
   methods: {
+    addMajor(type) {
+      if (type === "academy") {
+        this.addMajorInfo.parentId = 0;
+      } else if (type === "faculty") {
+        this.addMajorInfo.parentId = this.facultyId;
+      }
+      console.log("查看父级Id：", this.addMajorInfo);
+      // addMajor(this.addMajorInfo).then(res => {
+      //   if (res.data.data) {
+      //     this.visible = false;
+      //   }
+      // });
+    },
     /**
      * 添加课程
      */
@@ -174,27 +227,58 @@ export default {
      * 树形选择
      */
     onSelect(keys) {
-      let majorValue = keys[0].split("_")[0];
-      if (majorValue === "major") {
-        this.major = keys[0];
-        console.log(`选择的专业：${this.major}`);
+      if (keys.length) {
+        let selectKey = JSON.parse(keys[0]);
+        if (selectKey.type === "xueyuan") {
+          this.academyId = selectKey.value;
+          this.facultyId = "";
+          this.major = "";
+        } else if (selectKey.type === "yuanxi") {
+          this.facultyId = selectKey.value;
+          this.academyId = "";
+          this.major = "";
+        } else if (selectKey.type === "major") {
+          this.major = selectKey.value;
+          this.academyId = "";
+          this.facultyId = "";
+        }
+        console.log("当前选择类型：", selectKey.type);
       } else {
+        this.academyId = "";
+        this.facultyId = "";
         this.major = "";
-        this.gradeSelect = false;
       }
     },
     /**
      * 年级选择
      */
     handleChange(value) {
-      console.log(`选择年级${value}`);
+      console.log(`选择年级：${value}`);
+    },
+    /**
+     * 打开对话框
+     */
+    showModal() {
+      this.visible = true;
+    },
+    /**
+     * 页面初始化数据
+     */
+    initData() {
+      // 获取年级列表
+      getGradeList().then(res => {
+        this.selectData = res.data.data;
+        // console.log('年级列表：', res.data.data)
+      });
+      // 获取学院树形结构
+      getTreeData().then(res => {
+        console.log("获取树形结构：", res);
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    getInTheater().then(res => {
-      console.log('请求结果：', res)
-    })
+    this.initData();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -218,6 +302,12 @@ export default {
     box-sizing: border-box;
     padding-top: 150px;
     flex: 1;
+  }
+  .academy {
+    display: flex;
+    justify-content: center;
+    padding-top: 200px !important;
+    // align-items: center;
   }
   .function {
     flex: 4;

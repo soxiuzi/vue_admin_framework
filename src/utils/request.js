@@ -1,15 +1,18 @@
 import axios from 'axios'
+import store from '../store'
 const config = require('../../config/index.js')
 
 const durationTime = 3 * 1000
 
-const whiteList = []; // 请求白名单
+const whiteList = [
+  'http://192.168.1.112:8082/auth/login'
+]; // 请求白名单
 
 // process.env.NODE_ENV == 'production' ? config.build.env.Base_url : config.dev.env.Base_url
 
 // 创建axios实例
 let service = axios.create({
-  baseURL: '/api/v2/',
+  baseURL: 'http://192.168.1.112:8082',
   // 请求超时时间
   timeout: 50000,
   // 跨域是否需要凭证
@@ -22,12 +25,11 @@ service.interceptors.request.use(
     if(whiteList.indexOf(config.url) < 0) {
       // 白名单以外的URL都需要token凭证进行请求权
       config.headers = {
-        'Authorization': 'token'
+        'Authorization': store.getters.token
       }
       // 跨域需要凭证
       config.withCredentials = true
     } 
-    console.log('请求配置：', config)
     // 设置自定义请求头
     config.header = {
       'X-Requested-With': 'XMLHttpRequest'
