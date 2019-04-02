@@ -20,7 +20,7 @@
             </router-link>
           </a-menu-item>
           <a-menu-item key="2">
-            <router-link :to="{ name: 'coursemanage' }">
+            <router-link :to="{ name: 'majormanage' }">
               <a-icon type="database" />
               <span>专业管理</span>
             </router-link>
@@ -32,7 +32,7 @@
             </router-link>
           </a-menu-item>
           <a-menu-item key="4">
-            <router-link :to="{ name: 'grademanage' }">
+            <router-link :to="{ name: 'coursemanage' }">
               <a-icon type="pie-chart" />
               <span>课程管理</span>
             </router-link>

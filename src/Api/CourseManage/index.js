@@ -27,6 +27,19 @@ export function addMajor(addMajorInfo) {
 }
 
 /**
+ * 更新专业名称
+ * @param {Object} updateInfo 更新信息
+ */
+export function UpdateMajorInfo(updateInfo) {
+  return request({
+    url: '/professional/update',
+    method: 'POST',
+    data: updateInfo
+  })
+}
+
+
+/**
  * 获取年级列表
  */
 export function getGradeList() {

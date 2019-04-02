@@ -30,12 +30,20 @@ let router = new Router({
           component: () => import(/* webpackChunkName: "coursemanage" */ '_view/CourseManage')
         },
         {
+          path: '/majorManage',
+          name: 'majormanage',
+          meta: {
+            title: '专业管理'
+          },
+          component: () => import(/* webpackChunkName: "majormanage" */ '_view/MajorManage')
+        },
+        {
           path: '/teachermanage',
           name: 'teachermanage',
           meta: {
             title: '教师管理'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/TeacherManage')
+          component: () => import(/* webpackChunkName: "teachermanage" */ '_view/TeacherManage')
         },
         {
           path: '/grademanage',
@@ -43,7 +51,7 @@ let router = new Router({
           meta: {
             title: '年级管理'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/GradeManage')
+          component: () => import(/* webpackChunkName: "grademanage" */ '_view/GradeManage')
         },
         {
           path: '/questionmanage',
@@ -51,7 +59,7 @@ let router = new Router({
           meta: {
             title: '题目管理'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/QuestionManage')
+          component: () => import(/* webpackChunkName: "questionmanage" */ '_view/QuestionManage')
         },
         {
           path: '/questionimport',
@@ -59,7 +67,7 @@ let router = new Router({
           meta: {
             title: '题目导入'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/QuestionImport')
+          component: () => import(/* webpackChunkName: "questionimport" */ '_view/QuestionImport')
         },
         {
           path: '/questionshare',
@@ -67,7 +75,7 @@ let router = new Router({
           meta: {
             title: '题库共享'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/QuestionShare')
+          component: () => import(/* webpackChunkName: "questionshare" */ '_view/QuestionShare')
         },
         {
           path: '/answermanage',
@@ -75,7 +83,7 @@ let router = new Router({
           meta: {
             title: '答案管理'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/AnswerManage')
+          component: () => import(/* webpackChunkName: "answermanage" */ '_view/AnswerManage')
         },
         {
           path: '/papermanage',
@@ -83,7 +91,7 @@ let router = new Router({
           meta: {
             title: '出题组卷管理'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/PaperManage')
+          component: () => import(/* webpackChunkName: "papermanage" */ '_view/PaperManage')
         },
         {
           path: '/papermake',
@@ -91,7 +99,7 @@ let router = new Router({
           meta: {
             title: '组卷一键生成'
           },
-          component: () => import(/* webpackChunkName: "coursemanage" */ '_view/PaperMake')
+          component: () => import(/* webpackChunkName: "papermake" */ '_view/PaperMake')
         }
       ],
       meta: {

@@ -1,6 +1,6 @@
 <template>
   <div class='grade_manage'>
-    年级管理页
+    课程管理页
   </div>
 </template>
 
