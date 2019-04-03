@@ -11,6 +11,14 @@ export function convertEnglish(chineseStr) {
   return resultEnglishStr.join('')
 }
 
+export function getInitialByCourseName(str) {
+  let initialLetter = pinyin('kecheng', {
+    style: pinyin.STYLE_FIRST_LETTER
+  })
+  console.log('首字母：', initialLetter)
+  // return initialLetter[0].toUpperCase()
+}
+
 /**
  * 一维数组去重
  * @param {Array} arr 去重数组

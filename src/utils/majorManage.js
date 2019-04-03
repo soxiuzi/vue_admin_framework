@@ -1,6 +1,4 @@
-import {
-  filterArrOneObj
-} from '_utils/utils.js'
+import { filterArrOneObj } from '_utils/utils.js'
 
 /**
  * 根据后端数据构建自定义树形结构
@@ -74,20 +72,6 @@ export function getTreeStructure(treeData) {
         } else {
           let academyTree = treeData[i],
             facultyTree = treeData[i].children[j];
-          resultTreeData.push({
-            title: treeData[i].professionalName || treeData[i].curriculumName,
-            slots: {
-              icon: "dir"
-            },
-            key: JSON.stringify({
-              type: "firstDir",
-              value: academyTree.professionalCode,
-              length: academyTree.children ? academyTree.children.length + 1 : 1,
-              id: academyTree.id,
-              sort: academyTree.sort
-            }),
-            children: []
-          })
           resultTreeData.forEach(tree => {
             let parentId = JSON.parse(tree.key).id;
             if (parentId !== treeData[i].id) {
@@ -110,7 +94,7 @@ export function getTreeStructure(treeData) {
           resultTreeData = filterArrOneObj(resultTreeData, 'title')
           resultTreeData.forEach(tree => {
             let parentId = JSON.parse(tree.key).id;
-            if (facultyTree.parentId == parentId) {
+              if (facultyTree.parentId == parentId) {
               tree.children.push({
                 title: facultyTree.professionalName || facultyTree.curriculumName,
                 slots: {

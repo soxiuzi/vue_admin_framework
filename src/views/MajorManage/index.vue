@@ -22,7 +22,7 @@
     </a-modal>
     <div class="choose_major">
       <div class="addAcademy">
-        <a-button @click="showModalForAdd" size="large" type="primary">添加学院</a-button>
+        <a-button @click="showModalForAdd('course')" size="large" type="primary">添加学院</a-button>
       </div>请先选择您的专业：
       <tree-control @select-key="onSelect" :tree-data="treeData"></tree-control>
     </div>
@@ -34,10 +34,12 @@
     >
       <div v-if="academyId" class="function academy animated">
         <a-button @click="showModalForUpdate" size="large" type="primary">修改学院名称</a-button>
+        <a-button @click="deleteMajor" size="large" type="primary">删除学院</a-button>
         <a-button @click="showModalForAdd" size="large" type="primary">添加院系</a-button>
       </div>
       <div v-else-if="facultyId" class="function academy animated">
         <a-button @click="showModalForUpdate" size="large" type="primary">修改院系名称</a-button>
+        <a-button @click="deleteMajor" size="large" type="primary">删除院系</a-button>
         <a-button @click="showModalForAdd" size="large" type="primary">添加专业</a-button>
       </div>
       <div v-else-if="gradeSelect" class="function animated">
@@ -48,7 +50,7 @@
             placeholder="请选择年级"
             optionFilterProp="children"
             style="width: 200px"
-            @change="handleChange"
+            @change="selectGrade"
           >
             <a-select-option
               v-for="(grade, index) in selectData"
@@ -58,6 +60,8 @@
           </a-select>
         </div>
         <div class="course_table">
+          <a-button class="course_add" @click="showModalForUpdate">修改专业名称</a-button>
+          <a-button class="course_add" @click="deleteMajor">删除专业</a-button>
           <a-button class="course_add" @click="handleAdd">添加课程</a-button>
           <a-table
             @change="pageChange"
@@ -89,9 +93,9 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { message } from "ant-design-vue";
 import TreeControl from "_com/TreeControl/index.vue";
-import { getTreeData, addMajor, getGradeList, UpdateMajorInfo } from "_api/CourseManage/index";
+import { getTreeData, addMajor, getGradeList, UpdateMajorInfo, DeleteMajor, getCourseList, getMajorCourse } from "_api/MajorManage";
 import { convertEnglish, deepCopy } from "_utils/utils";
-import { getTreeStructure } from "_utils/courseManage";
+import { getTreeStructure } from "_utils/majorManage";
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -118,6 +122,8 @@ export default {
       addVisible: false,
       test: false,
       value: "",
+      saveId: "",
+      gradeId: "", // 年级Id
       academySort: "", // 学院排序
       facultySort: "", // 院系排序
       majorSort: "", // 专业排序
@@ -192,13 +198,28 @@ export default {
       this.addMajorInfo.professionalCode = convertEnglish(
         this.addMajorInfo.professionalName
       );
-      // console.log("查看父级Id：", this.addMajorInfo);
+      this.addMajorInfo.parentId = this.saveId
+      if(this.saveId === 0) {
+        this.addMajorInfo.sort = this.academySort
+      }
+      // console.log("默认树排序：", this.academySort);
       addMajor(this.addMajorInfo).then(res => {
         if (res.data.data) {
           this.initData()
           this.addVisible = false;
         }
       });
+    },
+    /**
+     * 删除专业项
+     */
+    deleteMajor() {
+      DeleteMajor(this.addMajorInfo.parentId).then(res => {
+        if(res.data.data) {
+          this.initData()
+        }
+      })
+      // console.log('删除：', this.addMajorInfo)
     },
     /**
      * 更新专业项
@@ -238,38 +259,42 @@ export default {
     onSelect(keys) {
       if (keys.length) {
         let selectKey = JSON.parse(keys[0]);
-        console.log("选择的keys:", selectKey);
-        if (selectKey.type === "xueyuan") {
+        // console.log("选择的keys:", selectKey);
+        if (selectKey.type === "firstDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
           this.updateMajorInfo.sort = selectKey.sort
-          this.academyId = selectKey.value;
+          this.academyId = selectKey.id;
+          this.saveId = selectKey.id
           this.facultyId = "";
           this.major = "";
           this.modalTitle = "学院";
-        } else if (selectKey.type === "yuanxi") {
+        } else if (selectKey.type === "secondDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
           this.updateMajorInfo.sort = selectKey.sort
-          this.facultyId = selectKey.value;
+          this.facultyId = selectKey.id;
+          this.saveId = selectKey.id
           this.academyId = "";
           this.major = "";
           this.modalTitle = "院系";
-        } else if (selectKey.type === "major") {
+        } else if (selectKey.type === "thirdDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
           this.updateMajorInfo.sort = selectKey.sort
-          this.major = selectKey.value;
+          this.major = selectKey.id;
+          this.saveId = selectKey.id
           this.academyId = "";
           this.facultyId = "";
-          this.modalTitle = "课程";
+          this.modalTitle = "专业";
         }
-        console.log("当前选择类型：", selectKey.type);
+        // console.log("当前选择类型：", selectKey.type);
       } else {
         this.addMajorInfo.parentId = "";
         this.addMajorInfo.sort = "";
         this.updateMajorInfo.sort = ""
         this.academyId = "";
+        this.saveId = 0
         this.facultyId = "";
         this.major = "";
         this.modalTitle = "";
@@ -278,13 +303,22 @@ export default {
     /**
      * 年级选择
      */
-    handleChange(value) {
-      console.log(`选择年级：${value}`);
+    selectGrade(value) {
+      this.gradeId = value
+      // console.log('当前专业Id：', this.major)
+      getMajorCourse(this.major, this.gradeId).then(res => {
+        console.log('获取课程列表：', res.data.data)
+      }) 
     },
     /**
      * 打开添加对话框
      */
-    showModalForAdd() {
+    showModalForAdd(type = 'other') {
+      if(type === 'course') {
+        this.saveId = 0
+      }else {
+        console.log('添加其他')
+      }
       this.addVisible = true;
     },
     /**
@@ -304,10 +338,15 @@ export default {
       // 获取学院树形结构
       getTreeData().then(res => {
         const treeData = res.data.data;
+        this.academySort = treeData.length + 1;
         this.addMajorInfo.sort = treeData.length + 1;
         this.treeData = getTreeStructure(treeData);
-        console.log('树形结构：', this.treeData)
+        // console.log('树形结构：', this.treeData)
       });
+      // 获取课程列表
+      getCourseList().then(res => {
+        console.log('课程列表：', res)
+      })
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
