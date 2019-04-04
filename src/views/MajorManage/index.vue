@@ -20,6 +20,30 @@
     >
       <a-input v-model="addMajorInfo.professionalName" :placeholder="`请输入${modalTitle}名称`"></a-input>
     </a-modal>
+    <a-modal
+      title="添加课程"
+      v-model="addCourseVisible"
+      centered
+      okText="提交"
+      cancelText="取消"
+      @ok="addCourse"
+    >
+      <span>选择添加的课程：</span>
+      <a-select
+        showSearch
+        placeholder="可输入关键字进行搜索"
+        optionFilterProp="children"
+        style="width: 200px"
+        @select="chooseAddCourse"
+        :filterOption="filterOption"
+      >
+        <a-select-option
+          v-for="course in courseList"
+          :key="course.id"
+          :title="course.curriculumCode"
+        >{{ course.curriculumName }}</a-select-option>
+      </a-select>
+    </a-modal>
     <div class="choose_major">
       <div class="addAcademy">
         <a-button @click="showModalForAdd('course')" size="large" type="primary">添加学院</a-button>
@@ -62,7 +86,7 @@
         <div class="course_table">
           <a-button class="course_add" @click="showModalForUpdate">修改专业名称</a-button>
           <a-button class="course_add" @click="deleteMajor">删除专业</a-button>
-          <a-button class="course_add" @click="handleAdd">添加课程</a-button>
+          <a-button class="course_add" @click="showAddCourseModal">添加课程</a-button>
           <a-table
             @change="pageChange"
             :loading="tableLoading"
@@ -70,14 +94,15 @@
             bordered
             :dataSource="dataSource"
             :columns="columns"
+            :locale="{emptyText: '暂无数据'}"
           >
             <template slot="operation" slot-scope="text, record">
               <a-popconfirm
                 v-if="dataSource.length"
                 title="Sure to delete?"
-                @confirm="() => onDelete(record.key)"
+                @confirm="() => deleteCourse(record.key)"
               >
-                <a style="color: skyblue" href="javascript:;">修改课程</a>
+                <a style="color: skyblue" href="javascript:;">删除课程</a>
                 <!-- <a style="color: skyblue; margin-left: 10px" href="javascript:;">修改课程</a> -->
               </a-popconfirm>
             </template>
@@ -93,7 +118,17 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { message } from "ant-design-vue";
 import TreeControl from "_com/TreeControl/index.vue";
-import { getTreeData, addMajor, getGradeList, UpdateMajorInfo, DeleteMajor, getCourseList, getMajorCourse } from "_api/MajorManage";
+import {
+  getTreeData,
+  addMajor,
+  getGradeList,
+  UpdateMajorInfo,
+  DeleteMajor,
+  getCourseList,
+  getMajorCourse,
+  addCourseForMajor,
+  deleteMajorCourse
+} from "_api/MajorManage";
 import { convertEnglish, deepCopy } from "_utils/utils";
 import { getTreeStructure } from "_utils/majorManage";
 
@@ -106,20 +141,35 @@ export default {
       modalTitle: "",
       testData: [],
       addMajorInfo: {
+        // 添加专业信息
         parentId: 0,
         sort: "",
         professionalName: "",
         professionalCode: ""
       },
       updateMajorInfo: {
+        // 更新专业信息
         id: "",
         sort: 0,
         professionalName: "",
         professionalCode: ""
       },
+      deleteCourseInfo: {
+        // 删除课程信息
+        professionalId: "",
+        curriculumId: "",
+        gradeId: ""
+      },
+      addCourseInfo: {
+        // 添加课程信息
+        professionalId: "", // 专业Id
+        curriculumId: "", // 课程Id
+        gradeId: "" // 年级Id
+      },
       selectData: [], // 年级选择数据
       updateVisible: false,
       addVisible: false,
+      addCourseVisible: false,
       test: false,
       value: "",
       saveId: "",
@@ -133,31 +183,13 @@ export default {
       gradeSelect: false, // 年级选择
       tableLoading: false,
       pagination: {
-        total: 4,
-        pageSize: 2
+        total: 0,
+        pageSize: 1
       },
+      courseList: [], // 课程列表
       treeData: [],
       treeExpandedKeys: [],
-      dataSource: [
-        {
-          key: "0",
-          name: "Edward King 0",
-          courseInfo: "课程信息介绍",
-          index: "index"
-        },
-        {
-          key: "1",
-          name: "Edward King 1",
-          courseInfo: "课程信息介绍",
-          index: "index"
-        },
-        {
-          key: "2",
-          name: "Edward King 1",
-          courseInfo: "课程信息介绍",
-          index: "index"
-        }
-      ],
+      dataSource: [],
       count: 2,
       columns: [
         {
@@ -168,10 +200,6 @@ export default {
           title: "课程名称",
           dataIndex: "name",
           scopedSlots: { customRender: "name" }
-        },
-        {
-          title: "课程信息",
-          dataIndex: "courseInfo"
         },
         {
           title: "操作",
@@ -192,20 +220,47 @@ export default {
   //方法集合
   methods: {
     /**
+     * 添加课程
+     */
+    addCourse() {
+      addCourseForMajor(this.addCourseInfo).then(res => {
+        if (res.data.data) {
+          // this.initData();
+          this.addCourseVisible = false;
+          this.getMajorCourse()
+        }
+        console.log("添加结果：", res.data.data);
+      });
+      // console.log("添加课程信息：", this.addCourseInfo);
+    },
+    /**
+     * 删除专业课程
+     */
+    deleteCourse(id) {
+      this.deleteCourseInfo.professionalId = this.major;
+      this.deleteCourseInfo.curriculumId = id;
+      this.deleteCourseInfo.gradeId = this.gradeId;
+      deleteMajorCourse(this.deleteCourseInfo).then(res => {
+        // this.initData();
+        this.getMajorCourse()
+        console.log("删除结果：", res.data.data);
+      });
+    },
+    /**
      * 添加专业项
      */
     addMajor() {
       this.addMajorInfo.professionalCode = convertEnglish(
         this.addMajorInfo.professionalName
       );
-      this.addMajorInfo.parentId = this.saveId
-      if(this.saveId === 0) {
-        this.addMajorInfo.sort = this.academySort
+      this.addMajorInfo.parentId = this.saveId;
+      if (this.saveId === 0) {
+        this.addMajorInfo.sort = this.academySort;
       }
       // console.log("默认树排序：", this.academySort);
       addMajor(this.addMajorInfo).then(res => {
         if (res.data.data) {
-          this.initData()
+          this.initData();
           this.addVisible = false;
         }
       });
@@ -215,10 +270,10 @@ export default {
      */
     deleteMajor() {
       DeleteMajor(this.addMajorInfo.parentId).then(res => {
-        if(res.data.data) {
-          this.initData()
+        if (res.data.data) {
+          this.initData();
         }
-      })
+      });
       // console.log('删除：', this.addMajorInfo)
     },
     /**
@@ -231,27 +286,33 @@ export default {
       this.updateMajorInfo.id = this.addMajorInfo.parentId;
       this.updateMajorInfo.professionalName = this.addMajorInfo.professionalName;
       UpdateMajorInfo(this.updateMajorInfo).then(res => {
-        this.initData()
-        this.updateVisible = false
-      })
+        this.initData();
+        this.updateVisible = false;
+      });
       // console.log('查看当前Id:', this.updateMajorInfo)
       // console.log('更新专业项')
-    },
-    /**
-     * 添加课程
-     */
-    handleAdd() {
-      if (!this.major) {
-        message.warning("请先选择您的专业！");
-      } else {
-        console.log("添加课程");
-      }
     },
     /**
      * 表格分页功能
      */
     pageChange(current) {
       console.log("当前：", current);
+    },
+    /**
+     * 选择添加的课程
+     */
+    chooseAddCourse(value) {
+      this.addCourseInfo.curriculumId = value;
+      this.addCourseInfo.gradeId = this.gradeId;
+      this.addCourseInfo.professionalId = this.major;
+    },
+    filterOption(input, option) {
+      // console.log('option:', option)
+      return (
+        option.componentOptions.children[0].text
+          .toLowerCase()
+          .indexOf(input.toLowerCase()) >= 0
+      );
     },
     /**
      * 树形选择
@@ -263,27 +324,27 @@ export default {
         if (selectKey.type === "firstDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
-          this.updateMajorInfo.sort = selectKey.sort
+          this.updateMajorInfo.sort = selectKey.sort;
           this.academyId = selectKey.id;
-          this.saveId = selectKey.id
+          this.saveId = selectKey.id;
           this.facultyId = "";
           this.major = "";
           this.modalTitle = "学院";
         } else if (selectKey.type === "secondDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
-          this.updateMajorInfo.sort = selectKey.sort
+          this.updateMajorInfo.sort = selectKey.sort;
           this.facultyId = selectKey.id;
-          this.saveId = selectKey.id
+          this.saveId = selectKey.id;
           this.academyId = "";
           this.major = "";
           this.modalTitle = "院系";
         } else if (selectKey.type === "thirdDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
-          this.updateMajorInfo.sort = selectKey.sort
+          this.updateMajorInfo.sort = selectKey.sort;
           this.major = selectKey.id;
-          this.saveId = selectKey.id
+          this.saveId = selectKey.id;
           this.academyId = "";
           this.facultyId = "";
           this.modalTitle = "专业";
@@ -292,9 +353,9 @@ export default {
       } else {
         this.addMajorInfo.parentId = "";
         this.addMajorInfo.sort = "";
-        this.updateMajorInfo.sort = ""
+        this.updateMajorInfo.sort = "";
         this.academyId = "";
-        this.saveId = 0
+        this.saveId = 0;
         this.facultyId = "";
         this.major = "";
         this.modalTitle = "";
@@ -304,20 +365,17 @@ export default {
      * 年级选择
      */
     selectGrade(value) {
-      this.gradeId = value
-      // console.log('当前专业Id：', this.major)
-      getMajorCourse(this.major, this.gradeId).then(res => {
-        console.log('获取课程列表：', res.data.data)
-      }) 
+      this.gradeId = value;
+      this.getMajorCourse()
     },
     /**
      * 打开添加对话框
      */
-    showModalForAdd(type = 'other') {
-      if(type === 'course') {
-        this.saveId = 0
-      }else {
-        console.log('添加其他')
+    showModalForAdd(type = "other") {
+      if (type === "course") {
+        this.saveId = 0;
+      } else {
+        console.log("添加其他");
       }
       this.addVisible = true;
     },
@@ -325,7 +383,34 @@ export default {
      * 打开修改对话框
      */
     showModalForUpdate() {
-      this.updateVisible = true
+      this.updateVisible = true;
+    },
+    /**
+     * 打开添加课程对话框
+     */
+    showAddCourseModal() {
+      this.addCourseVisible = true;
+    },
+    /**
+     * 获取专业课程
+     */
+    getMajorCourse() {
+      this.dataSource = []
+      getMajorCourse(this.major, this.gradeId).then(res => {
+        let courseList = res.data.data;
+        if (courseList && courseList.length) {
+          for (let i = 0; i < courseList.length; i++) {
+            this.dataSource.push({
+              name: courseList[i].curriculumName,
+              index: i + 1,
+              key: courseList[i].id
+            });
+          }
+        } else {
+          this.dataSource = [];
+        }
+        console.log("获取课程列表：", res.data.data);
+      });
     },
     /**
      * 页面初始化数据
@@ -345,8 +430,8 @@ export default {
       });
       // 获取课程列表
       getCourseList().then(res => {
-        console.log('课程列表：', res)
-      })
+        this.courseList = res.data.data;
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -390,7 +475,7 @@ export default {
     box-sizing: border-box;
     padding: 100px 20px 0;
     .ant-btn {
-      margin-left: 50px
+      margin-left: 50px;
     }
     .course_table {
       overflow: hidden;

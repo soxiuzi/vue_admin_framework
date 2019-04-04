@@ -90,3 +90,27 @@ export function getMajorCourse(professionalId, gradeId) {
     }
   })
  }
+
+ /**
+  * 添加专业课程
+  * @param {Object} courseInfo
+  */
+ export function addCourseForMajor(courseInfo) {
+   return request({
+     url:'/professional/setProfessionalCurriculum',
+     method: 'POST',
+     data: courseInfo
+   })
+ }
+
+ /**
+  * 删除专业课程
+  * @param {Object} courseInfo
+  */
+ export function deleteMajorCourse(courseInfo) {
+  return request({
+    url: '/professional/removeProfessionalCurriculum',
+    method: 'POST',
+    data: courseInfo
+  })
+ }
