@@ -1,3 +1,22 @@
 .login .ant-layout{
     background: transparent
 }
+.question_manage .ant-table-bordered .ant-table-thead > tr > th, .ant-table-bordered .ant-table-tbody > tr > td {
+    background: #fff
+}
+
+.question_manage {
+    .ant-modal {
+        .options {
+          display: flex;
+          margin: 30px 0;
+          &:first-child {
+            flex: 4;
+            margin-right: 15px;
+          }
+          &:last-child {
+            flex: 1;
+          }
+        }
+      }
+}

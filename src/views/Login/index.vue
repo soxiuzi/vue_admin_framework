@@ -11,7 +11,7 @@
             <a-input type="password" v-model="userInfo.password" placeholder="请输入密码"></a-input>
           </a-form-item>
           <a-button :size="btnSize" type="primary" class="login_btn" @click="login">登录</a-button>
-          <third-login class="login_method"></third-login>
+          <!-- <third-login class="login_method"></third-login> -->
         </a-form>
       </a-layout-content>
     </a-layout>

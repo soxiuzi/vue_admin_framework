@@ -44,7 +44,7 @@ let router = new Router({
             title: '教师管理'
           },
           component: () => import(/* webpackChunkName: "teachermanage" */ '_view/TeacherManage')
-        },
+        },        
         {
           path: '/grademanage',
           name: 'grademanage',
@@ -106,6 +106,22 @@ let router = new Router({
         title: '医专在线题库系统'
       },
       component: () => import(/* webpackChunkName: "home" */ '_view/Layout')
+    },
+    {
+      path: '/makeExamination',
+      name: 'makeExamination',
+      meta: {
+        title: '编辑试卷'
+      },
+      component: () => import(/* webpackChunkName: "makeExamination" */ '_view/ExaminationMake')
+    },
+    {
+      path: '/register',
+      name: 'register',
+      meta: {
+        title: '注册'
+      },
+      component: () => import(/* webpackChunkName: "register" */ '_view/Register')
     },
     {
       path: '/login',

@@ -153,6 +153,10 @@ export default {
     },
     // 添加课程
     addCourse() {
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: `正在添加${this.modalTitle}`
+      });
       this.addCourseInfo.curriculumCode = convertEnglish(
         this.addCourseInfo.curriculumName
       );
@@ -175,16 +179,19 @@ export default {
             this.addVisible = false;
             this.addCourseInfo.curriculumName = "";
             this.initData();
+            this.$store.dispatch("ChangeLayoutStatus", { status: false });
+            this.$message.success("添加成功！");
           }
         });
       } else {
-        alert("请填写名称后再添加！");
+        this.$message.warning("请填写名称后再添加！");
       }
     },
     /**
      * 更新课程名称
      */
     updateCourse() {
+      this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: "更新名称..." })
       this.updateInfo.id = this.addCourseInfo.parentId;
       this.updateInfo.curriculumCode = convertEnglish(
         this.updateInfo.curriculumName
@@ -201,20 +208,36 @@ export default {
           if (updateRes.data.data) {
             this.initData();
             this.updateVisible = false;
+            this.$store.dispatch("ChangeLayoutStatus", { status: false })
+            this.$message.success("更新成功！")
           }
-          console.log("更新结果：", updateRes);
         });
       } else {
-        alert("请填写名称后再添加！");
+        this.$message.warning("请填写名称后再添加！");
       }
     },
     /**
      * 删除课程
      */
     deleteCourse() {
-      deleteCourse(this.addCourseInfo.parentId).then(delRes => {
-        if(delRes.data.data) {
-          this.initData()
+      let that = this;
+      this.$confirm({
+        title: `删除操作`,
+        content: `确认删除？`,
+        cancelText: "取消",
+        centered: true,
+        onOk() {
+          that.$store.dispatch("ChangeLayoutStatus", {
+            status: true,
+            loadText: `正在删除`
+          });
+          deleteCourse(that.addCourseInfo.parentId).then(delRes => {
+            if (delRes.data.data) {
+              that.initData();
+              that.$store.dispatch("ChangeLayoutStatus", { status: false });
+              that.$message.success("删除成功！");
+            }
+          });
         }
       });
     },
@@ -223,7 +246,6 @@ export default {
       getCourseTree().then(res => {
         let courseTree = res.data.data;
         this.treeData = getTreeStructure(courseTree);
-        // console.log("课程树结构：", getTreeStructure(courseTree));
       });
     },
     onSelect(keys) {

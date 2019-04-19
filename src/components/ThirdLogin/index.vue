@@ -12,7 +12,7 @@
         <svg-icon :style="{fontSize: fontSize}" :icon-class="svg.iconClass"></svg-icon>
       </div>
     </div>
-  </div>
+  </div>  
 </template>
 
 <script>

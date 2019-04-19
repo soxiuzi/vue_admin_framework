@@ -9,11 +9,13 @@ import './styles/antd.scss'
 import './styles/common.scss'
 import '@/icons' // 全局注册svg组件
 import animated from 'animate.css'
+import Print from 'vue-print-nb'
 
 Vue.prototype.$axios = Axios
 
 Vue.use(animated)
 Vue.use(Antd)
+Vue.use(Print)
 
 if (process.env.NODE_ENV !== 'production') {
   Vue.config.performance = true

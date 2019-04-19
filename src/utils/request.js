@@ -1,5 +1,7 @@
 import axios from 'axios'
 import store from '../store'
+import { message } from 'ant-design-vue'
+
 const config = require('../../config/index.js')
 
 const durationTime = 3 * 1000
@@ -51,7 +53,7 @@ service.interceptors.response.use(
     return new Promise((resolve, reject) => {
       // console.log(error.response)
       if (error.response == null) {
-        alert('网络异常', 'error', durationTime)
+        message.warning('网络异常', 'error', durationTime)
         reject(error)
       } else {
         switch (error.response.status) {
@@ -59,15 +61,15 @@ service.interceptors.response.use(
             let res = error.response.data
             if (res.code === 500) {
               // 运行时异常
-              alert(`运行时异常：${res.code} ${res.message}`, 'error', durationTime)
+              message.warning(`运行时异常：${res.code} ${res.message}`, 'error', durationTime)
             } else {
               // 业务异常
-              alert(`业务异常: ${res.code} ${res.message}`, 'error', durationTime)
+              message.warning(`业务异常: ${res.code} ${res.message}`, 'error', durationTime)
             }
             reject(error)
             break
           case 403:
-            alert('无权访问', 'warning', durationTime)
+            message.warning('无权访问', 'warning', durationTime)
             break
         }
       }

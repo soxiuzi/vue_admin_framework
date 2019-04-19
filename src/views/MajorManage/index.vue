@@ -99,11 +99,12 @@
             <template slot="operation" slot-scope="text, record">
               <a-popconfirm
                 v-if="dataSource.length"
-                title="Sure to delete?"
+                title="确认删除该课程?"
+                cancelText="取消"
+                okText="确定"
                 @confirm="() => deleteCourse(record.key)"
               >
                 <a style="color: skyblue" href="javascript:;">删除课程</a>
-                <!-- <a style="color: skyblue; margin-left: 10px" href="javascript:;">修改课程</a> -->
               </a-popconfirm>
             </template>
           </a-table>
@@ -183,8 +184,7 @@ export default {
       gradeSelect: false, // 年级选择
       tableLoading: false,
       pagination: {
-        total: 0,
-        pageSize: 1
+        pageSize: 4
       },
       courseList: [], // 课程列表
       treeData: [],
@@ -223,15 +223,20 @@ export default {
      * 添加课程
      */
     addCourse() {
+      this.tableLoading = true;
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在添加..."
+      });
       addCourseForMajor(this.addCourseInfo).then(res => {
         if (res.data.data) {
-          // this.initData();
           this.addCourseVisible = false;
-          this.getMajorCourse()
+          this.tableLoading = false;
+          this.getMajorCourse();
+          this.$store.dispatch("ChangeLayoutStatus", { status: false });
+          this.$message.success("添加成功！");
         }
-        console.log("添加结果：", res.data.data);
       });
-      // console.log("添加课程信息：", this.addCourseInfo);
     },
     /**
      * 删除专业课程
@@ -240,28 +245,39 @@ export default {
       this.deleteCourseInfo.professionalId = this.major;
       this.deleteCourseInfo.curriculumId = id;
       this.deleteCourseInfo.gradeId = this.gradeId;
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在删除..."
+      });
       deleteMajorCourse(this.deleteCourseInfo).then(res => {
-        // this.initData();
-        this.getMajorCourse()
-        console.log("删除结果：", res.data.data);
+        if (res.data.data) {
+          this.getMajorCourse();
+          this.$store.dispatch("ChangeLayoutStatus", { status: false });
+          this.$message.success("删除成功！");
+        }
       });
     },
     /**
      * 添加专业项
      */
     addMajor() {
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在添加..."
+      });
       this.addMajorInfo.professionalCode = convertEnglish(
         this.addMajorInfo.professionalName
       );
       this.addMajorInfo.parentId = this.saveId;
       if (this.saveId === 0) {
         this.addMajorInfo.sort = this.academySort;
-      }
-      // console.log("默认树排序：", this.academySort);
+      } 
       addMajor(this.addMajorInfo).then(res => {
         if (res.data.data) {
           this.initData();
           this.addVisible = false;
+          this.$store.dispatch("ChangeLayoutStatus", { status: false });
+          this.$message.success("添加成功！");
         }
       });
     },
@@ -269,17 +285,38 @@ export default {
      * 删除专业项
      */
     deleteMajor() {
-      DeleteMajor(this.addMajorInfo.parentId).then(res => {
-        if (res.data.data) {
-          this.initData();
+      let that = this
+      this.$confirm({
+        title: "删除操作",
+        content: "确定删除？",
+        centered: true,
+        cancelText: "取消",
+        onOk() {
+          that.$store.dispatch("ChangeLayoutStatus", {
+            status: true,
+            loadText: "正在删除..."
+          });
+          DeleteMajor(that.addMajorInfo.parentId).then(res => {
+            if (res.data.data) {
+              that.initData();
+              that.$store.dispatch("ChangeLayoutStatus", { status: false });
+              that.$message.success("删除成功！");
+              that.facultyId = ""
+              that.academyId = ""
+              that.gradeSelect = false
+            }
+          });
         }
       });
-      // console.log('删除：', this.addMajorInfo)
     },
     /**
      * 更新专业项
      */
     updateMajor() {
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在更新信息..."
+      });
       this.updateMajorInfo.professionalCode = convertEnglish(
         this.addMajorInfo.professionalName
       );
@@ -288,9 +325,9 @@ export default {
       UpdateMajorInfo(this.updateMajorInfo).then(res => {
         this.initData();
         this.updateVisible = false;
+        this.$store.dispatch("ChangeLayoutStatus", { status: false });
+        this.$message.success("信息更新成功！");
       });
-      // console.log('查看当前Id:', this.updateMajorInfo)
-      // console.log('更新专业项')
     },
     /**
      * 表格分页功能
@@ -349,7 +386,6 @@ export default {
           this.facultyId = "";
           this.modalTitle = "专业";
         }
-        // console.log("当前选择类型：", selectKey.type);
       } else {
         this.addMajorInfo.parentId = "";
         this.addMajorInfo.sort = "";
@@ -366,7 +402,7 @@ export default {
      */
     selectGrade(value) {
       this.gradeId = value;
-      this.getMajorCourse()
+      this.getMajorCourse();
     },
     /**
      * 打开添加对话框
@@ -395,7 +431,7 @@ export default {
      * 获取专业课程
      */
     getMajorCourse() {
-      this.dataSource = []
+      this.dataSource = [];
       getMajorCourse(this.major, this.gradeId).then(res => {
         let courseList = res.data.data;
         if (courseList && courseList.length) {

@@ -1,51 +1,45 @@
 <template>
-  <div class='layout'>
+  <div class="layout">
+    <back-up :visible="loadVisible" :spinText="spinText"></back-up>
     <a-layout>
       <a-layout-sider :collapsed="collapsed">
-        <div
-          style="color: #fff; height: 70px"
-          class="logo"
-        >
-          logo区
-        </div>
-        <a-menu
-          :defaultSelectedKeys="defaultSelectedKeys"
-          mode="inline"
-          theme="dark"
-        >
+        <div style="color: #fff; height: 70px" class="logo">logo区</div>
+        <a-menu :defaultSelectedKeys="defaultSelectedKeys" mode="inline" theme="dark">
           <a-menu-item key="1">
             <router-link :to="{ name: 'welcome' }">
-              <a-icon type="home" />
+              <a-icon type="home"/>
               <span>首页</span>
             </router-link>
           </a-menu-item>
           <a-menu-item key="2">
             <router-link :to="{ name: 'majormanage' }">
-              <a-icon type="database" />
+              <a-icon type="database"/>
               <span>专业管理</span>
             </router-link>
           </a-menu-item>
-          <a-menu-item key="3">
+          <!-- <a-menu-item key="3">
             <router-link :to="{ name: 'teachermanage' }">
               <a-icon type="pie-chart" />
               <span>教师管理</span>
             </router-link>
-          </a-menu-item>
+          </a-menu-item>-->
           <a-menu-item key="4">
             <router-link :to="{ name: 'coursemanage' }">
-              <a-icon type="pie-chart" />
+              <a-icon type="pie-chart"/>
               <span>课程管理</span>
             </router-link>
           </a-menu-item>
           <a-sub-menu key="sub1">
             <span slot="title">
-              <a-icon type="mail" /><span>题库管理</span></span>
+              <a-icon type="mail"/>
+              <span>题库管理</span>
+            </span>
             <a-menu-item key="5">
               <router-link :to="{ name: 'questionmanage' }">题目管理</router-link>
             </a-menu-item>
-            <a-menu-item key="6">
+            <!-- <a-menu-item key="6">
               <router-link :to="{ name: 'questionimport' }">题目导入</router-link>
-            </a-menu-item>
+            </a-menu-item>-->
             <a-menu-item key="7">
               <router-link :to="{ name: 'questionshare' }">题库共享</router-link>
             </a-menu-item>
@@ -55,7 +49,9 @@
           </a-sub-menu>
           <a-sub-menu key="sub2">
             <span slot="title">
-              <a-icon type="mail" /><span>出题组卷管理</span></span>
+              <a-icon type="mail"/>
+              <span>出题组卷管理</span>
+            </span>
             <a-menu-item key="9">
               <router-link :to="{ name: 'papermanage' }">出题组卷管理</router-link>
             </a-menu-item>
@@ -65,20 +61,16 @@
           </a-sub-menu>
         </a-menu>
       </a-layout-sider>
-      <a-layout-header :style="{ left: collapsed ? '80px' : '200px', width: collapsed ? 'calc(100vw - 80px)' : 'calc(100vw - 200px)' }">
-        <a-button
-          type="primary"
-          @click="toggleCollapsed"
-        >
-          <a-icon :type="collapsed ? 'menu-unfold' : 'menu-fold' " />
+      <a-layout-header
+        :style="{ left: collapsed ? '80px' : '200px', width: collapsed ? 'calc(100vw - 80px)' : 'calc(100vw - 200px)' }"
+      >
+        <a-button type="primary" @click="toggleCollapsed">
+          <a-icon :type="collapsed ? 'menu-unfold' : 'menu-fold' "/>
         </a-button>
         <div>
           <a-dropdown>
             <div class="userInfo">
-              <a-avatar
-                :size="32"
-                icon="user"
-              />
+              <a-avatar :size="32" icon="user"/>
               <span class="username">管理员</span>
             </div>
             <a-menu slot="overlay">
@@ -89,16 +81,9 @@
           </a-dropdown>
         </div>
       </a-layout-header>
-      <a-layout
-        class="right_container"
-        :style="{ 'margin-left': collapsed ? '80px' : '200px' }"
-      >
+      <a-layout class="right_container" :style="{ 'margin-left': collapsed ? '80px' : '200px' }">
         <a-layout-content>
-          <Header
-            :explain="explain"
-            :current-page="currentPage"
-            v-if="indexPage"
-          />
+          <Header :explain="explain" :current-page="currentPage" v-if="indexPage"/>
           <div :class="currentPath == '/welcome' ? '' : 'content'">
             <transition
               name="fade"
@@ -120,10 +105,11 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { PAGEBREAD } from "@/var/pageBread.js";
 import Header from "_com/Header";
+import BackUp from "_com/BackUp"
 import { setTimeout } from "timers";
 export default {
   //import引入的组件需要注入到对象中才能使用
-  components: { Header },
+  components: { Header, BackUp },
   data() {
     //这里存放数据
     return {
@@ -137,7 +123,14 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    loadVisible() {
+      return this.$store.getters.layoutStatus
+    },
+    spinText() {
+      return this.$store.getters.loadText
+    }
+  },
   //监控data中的数据变化
   watch: {
     $route(to, from) {
