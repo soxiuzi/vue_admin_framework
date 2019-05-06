@@ -11,3 +11,14 @@ export function autoGenerator(examInfo) {
     data: examInfo
   })
 }
+
+/**
+ * 把保存试卷信息
+ */
+export function saveExamInfo(examInfo) {
+  return request({
+    url: '/examination/save',
+    method: 'POST',
+    data: examInfo
+  })
+}

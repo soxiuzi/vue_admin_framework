@@ -1,5 +1,5 @@
 <template>
-  <div ref="print" class="examination-make" id="printTest">
+  <div class="examination-make" ref="print" id="printTest">
     <!-- 加载框 -->
     <back-up :visible="backUpVisible" :spinText="spinText"></back-up>
     <!-- 编辑题目信息 -->
@@ -24,7 +24,7 @@
           >
             <span>选项{{ index }}：</span>
             <a-input v-model="currentSubjectInfo.options[index]"></a-input>
-          </div>
+          </div> 
         </div>
       </div>
       <div class="subject-title__update" v-else>
@@ -63,6 +63,7 @@
       <a-radio-group @change="chooseAddType" v-model="addTypeValue">
         <a-radio :style="radioStyle" :value="1">选择题库题目</a-radio>
         <a-radio :style="radioStyle" :value="2">新增题目</a-radio>
+        <a-radio :style="radioStyle" :value="3">他人共享的题目</a-radio>
       </a-radio-group>
       <div v-if="addTypeValue == 1" class="choose-subject">
         <div class="modal-content">
@@ -113,9 +114,37 @@
           <a-input v-model="subjectScore" placeholder="设置题目分数"></a-input>
         </div>
       </div>
+      <div v-if="addTypeValue == 3" class="choose-subject">
+        <div class="modal-content">
+          <span>选择题目：</span>
+          <a-select v-model="selectDefaultValue" @change="chooseSubject">
+            <a-select-option
+              v-for="subject in currentShareSubjects"
+              :key="subject.id"
+              :value="subject.id"
+            >{{ JSON.parse(subject.question).question }}</a-select-option>
+          </a-select>
+        </div>
+        <div class="modal-content">
+          <span>设置分数：</span>
+          <a-input v-model="score" placeholder="请输入分数"></a-input>
+        </div>
+      </div>
     </a-modal>
-    <a-button v-if="editStatus" @click="showSubjectType" type="primary">添加题型</a-button>
-    <div class="exam-content">
+    <div class="func_btns">
+      <router-link v-if="editStatus" style="color: #1890FF" :to="{ name: 'welcome' }">&lt; 返回题库系统</router-link>
+      <br>
+      <a-button v-if="editStatus" @click="showSubjectType" type="primary">添加试卷题型</a-button>
+      <a-button
+        v-if="editStatus"
+        @click="printExam"
+        class="print_exam"
+        v-print="printValue"
+        type="primary"
+      >打印试卷</a-button>
+    </div>
+    <div class="exam-content" >
+      <h1>{{ examinationName }}</h1>
       <div
         class="subject-type"
         v-for="(subjectType, index) in subjectTypeData"
@@ -124,74 +153,80 @@
         <h2>{{ index + 1 + '、' + subjectType.subjectTypeName }}</h2>
         <!-- 选择题 -->
         <div v-if="subjectType.id == 1" class="subject-item">
-          <div
-            v-for="(subject, index) in subjectData[subjectType.id]"
-            :key="subject.id"
-            class="choose-subject"
-          >
-            <div class="subject-title">
-              <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
-              <section v-if="editStatus" title="编辑">
-                <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
-              </section>
+          <div v-if="JSON.stringify(subjectData) !== '{}'">
+            <div
+              v-for="(subject, index) in subjectData[subjectType.id]"
+              :key="subject.id"
+              class="choose-subject"
+            >
+              <div class="subject-title">
+                <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
+                <section v-if="editStatus" title="编辑">
+                  <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
+                </section>
+              </div>
+              <p
+                class="subject-option"
+                v-for="(option,key) in JSON.parse(subject.question).options"
+                :key="key"
+              >{{ key + "、" + option }}</p>
             </div>
-            <p
-              class="subject-option"
-              v-for="(option,key) in JSON.parse(subject.question).options"
-              :key="key"
-            >{{ key + "、" + option }}</p>
           </div>
         </div>
         <!-- 判断题 -->
         <div v-if="subjectType.id == 2" class="subject-item">
-          <div
-            v-for="(subject, index) in subjectData[subjectType.id]"
-            :key="subject.id"
-            class="choose-subject"
-          >
-            <div class="subject-title">
-              <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
-              <section v-if="editStatus" title="编辑">
-                <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
-              </section>
+          <div v-if="JSON.stringify(subjectData) !== '{}'">
+            <div
+              v-for="(subject, index) in subjectData[subjectType.id]"
+              :key="subject.id"
+              class="choose-subject"
+            >
+              <div class="subject-title">
+                <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
+                <section v-if="editStatus" title="编辑">
+                  <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
+                </section>
+              </div>
             </div>
           </div>
         </div>
         <!-- 填空题 -->
         <div v-if="subjectType.id == 3" class="subject-item">
-          <div
-            v-for="(subject, index) in subjectData[subjectType.id]"
-            :key="subject.id"
-            class="choose-subject"
-          >
-            <div class="subject-title">
-              <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
-              <section v-if="editStatus" title="编辑">
-                <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
-              </section>
+          <div v-if="JSON.stringify(subjectData) !== '{}'">
+            <div
+              v-for="(subject, index) in subjectData[subjectType.id]"
+              :key="subject.id"
+              class="choose-subject"
+            >
+              <div class="subject-title">
+                <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
+                <section v-if="editStatus" title="编辑">
+                  <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
+                </section>
+              </div>
             </div>
           </div>
         </div>
         <!-- 简答题 -->
         <div v-if="subjectType.id == 4" class="subject-item">
-          <div
-            v-for="(subject, index) in subjectData[subjectType.id]"
-            :key="subject.id"
-            class="choose-subject"
-          >
-            <div class="subject-title">
-              <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
-              <section v-if="editStatus" title="编辑">
-                <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
-              </section>
+          <div v-if="JSON.stringify(subjectData) !== '{}'">
+            <div
+              v-for="(subject, index) in subjectData[subjectType.id]"
+              :key="subject.id"
+              class="choose-subject"
+            >
+              <div class="subject-title">
+                <p>{{ index + 1 + "、" + JSON.parse(subject.question).question}}</p>
+                <section v-if="editStatus" title="编辑">
+                  <svg-icon @onClick="showUpdateModal(subject)" class="edit" icon-class="edit"></svg-icon>
+                </section>
+              </div>
             </div>
           </div>
         </div>
-        <a-button v-if="editStatus" type="primary" @click="showSubject(subjectType.id)">添加题目</a-button>
+        <a-button v-if="editStatus" type="primary" @click="showSubject(subjectType.id)">+ 添加题目</a-button>
       </div>
     </div>
-    <router-link v-if="editStatus" style="color: tomato" :to="{ name: 'welcome' }">返回系统管理</router-link>
-    <a-button v-if="editStatus" @click="printExam" v-print="printValue" type="primary">打印试卷</a-button>
   </div>
 </template>
 
@@ -208,10 +243,9 @@ import {
 } from "_api/PaperManage.js";
 import {
   getSubjectListByExam,
-  updateSubjectInfo
+  updateSubjectInfo,
+  getCommonSubject
 } from "_api/ExaminationMake.js";
-import { setTimeout, clearTimeout } from 'timers';
-
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -221,8 +255,9 @@ export default {
   data() {
     //这里存放数据
     return {
+      examinationName: "", // 试卷名称
       editStatus: true, // 试卷编辑状态
-      printValue: '', // 调用打印
+      printValue: "", // 调用打印
       addTypeValue: "", // 添加题目的类型 0 - 题库题目 1 - 临时题目
       // backUpVisible: false, // 背景幕布显示控制器
       choiceOptions: [], // 选择题选项
@@ -235,7 +270,7 @@ export default {
       subjectScore: 0, // 题目分数
       subjectTypeOptions: [], // 试卷题型单选组
       subjectTypeData: [], // 试卷默认题型
-      subjectData: [], // 试卷默认题目
+      subjectData: {}, // 试卷默认题目
       subjectOptions: [], // 试卷题目单选组
       score: 0, // 题目分数
       subjectTypeId: "", // 试卷题型Id
@@ -243,20 +278,22 @@ export default {
       subjectId: "", // 试卷题目Id
       subjectTpyeValue: "", // 试卷题型单选值
       selectDefaultValue: "请选择题目", // 请选择题目
+      currentShareSubjects: [], // 当前题目类型他人共享的题目信息
+      defaultShareSubjects: [], // 初始他人共享的题目信息
       radioStyle: {
         display: "block",
         height: "30px",
         lineHeight: "30px"
-      }
+      } // 单选按钮样式
     };
   },
   //监听属性 类似于data概念
   computed: {
     backUpVisible() {
-      return this.$store.getters.layoutStatus
+      return this.$store.getters.layoutStatus;
     },
     spinText() {
-      return this.$store.getters.loadText
+      return this.$store.getters.loadText;
     }
   },
   //监控data中的数据变化
@@ -264,14 +301,14 @@ export default {
   //方法集合
   methods: {
     printExam() {
-      if(this.timer) {
-        clearTimeout(this.timer)
+      if (this.timer) {
+        clearTimeout(this.timer);
       }
-      this.editStatus = false
-      this.printValue = '#printTest'
+      this.editStatus = false;
+      this.printValue = "#printTest";
       this.timer = setTimeout(() => {
-        this.editStatus = true
-      }, 500)
+        this.editStatus = true;
+      }, 500);
     },
     /**
      * 删除一个选项
@@ -327,7 +364,10 @@ export default {
      * 更新题目信息
      */
     updateSubject() {
-      this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: "正在更新题目信息..." })
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在更新题目信息..."
+      });
       let options = [],
         currentOptions = this.currentSubjectInfo.options;
       for (let key in currentOptions) {
@@ -344,8 +384,8 @@ export default {
       updateSubjectInfo(updateInfo).then(res => {
         this.setUpdateSubjectVisible = false;
         this.getSubjectListByExam();
-        this.$store.dispatch("ChangeLayoutStatus", { status: false })
-        this.$message.success("题目信息更新成功！")
+        this.$store.dispatch("ChangeLayoutStatus", { status: false });
+        this.$message.success("题目信息更新成功！");
       });
     },
     /**
@@ -373,14 +413,18 @@ export default {
      * 设置题目
      */
     setSubject() {
-      if (this.subjectType) {
-        this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: "正在添加题目..." })
+      if (this.subjectType == 1) {
+        this.$store.dispatch("ChangeLayoutStatus", {
+          status: true,
+          loadText: "正在添加题目..."
+        });
         if (this.subjectTypeId == 1) {
           let subjectInfo = {
             subjectTypeId: this.subjectTypeId,
             question: this.subjectName,
             options: this.choiceOptions,
-            subjectType: this.subjectType
+            subjectType: this.subjectType,
+            score: this.subjectScore
           };
           addSubjectInfo(subjectInfo).then(res => {
             let subjectId = res.data.data.subjectId;
@@ -393,15 +437,16 @@ export default {
             setExaminationSubject(subjectInfo).then(res => {
               this.setSubjectVisible = false;
               this.getSubjectListByExam();
-              this.$store.dispatch("ChangeLayoutStatus", { status: false })
-              this.$message.success('添加成功！')
+              this.$store.dispatch("ChangeLayoutStatus", { status: false });
+              this.$message.success("添加成功！");
             });
           });
         } else {
           let currentSubjectInfo = {
             subjectTypeId: this.subjectTypeId,
             question: this.subjectName,
-            subjectType: this.subjectType
+            subjectType: this.subjectType,
+            score: this.score
           };
           addSubjectInfo(currentSubjectInfo).then(res => {
             let subjectId = res.data.data.subjectId;
@@ -409,13 +454,13 @@ export default {
               examinationId: this.examId,
               typeId: this.subjectTypeId,
               subjectId: subjectId,
-              score: this.subjectScore
+              score: this.score
             };
             setExaminationSubject(subjectInfo).then(res => {
               this.setSubjectVisible = false;
               this.getSubjectListByExam();
-              this.$store.dispatch("ChangeLayoutStatus", { status: false })
-              this.$message.success("添加成功！")
+              this.$store.dispatch("ChangeLayoutStatus", { status: false });
+              this.$message.success("添加成功！");
             });
           });
         }
@@ -431,15 +476,18 @@ export default {
         } else if (this.subjectId == "") {
           this.$message.warning("请选择题目后再设置！");
         } else {
-          this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: "正在添加题目..." })
+          this.$store.dispatch("ChangeLayoutStatus", {
+            status: true,
+            loadText: "正在添加题目..."
+          });
           setExaminationSubject(subjectInfo).then(res => {
             this.setSubjectVisible = false;
             this.score = 0;
             this.subjectId = "";
             this.selectDefaultValue = "请选择题目";
             this.getSubjectListByExam();
-            this.$store.dispatch("ChangeLayoutStatus", { status: false })
-            this.$message.success('添加成功！')
+            this.$store.dispatch("ChangeLayoutStatus", { status: false });
+            this.$message.success("添加成功！");
           });
         }
       }
@@ -450,14 +498,25 @@ export default {
     showSubject(id) {
       this.setSubjectVisible = true;
       this.subjectTypeId = id;
-      console.log("当前题型id：", id)
+      if (JSON.stringify(this.defaultShareSubjects) !== "[]") {
+        this.currentShareSubjects = this.defaultShareSubjects.filter(
+          item => item.questionType == id
+        );
+      }
     },
     /**
      * 获取试卷题目列表
      */
     getSubjectListByExam() {
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在加载试卷数据..."
+      });
       getSubjectListByExam(this.examId).then(res => {
-        this.subjectData = res.data.data;
+        this.$store.dispatch("ChangeLayoutStatus", { status: false });
+        if (res.data.data) {
+          this.subjectData = res.data.data;
+        }
       });
     },
     /**
@@ -465,20 +524,25 @@ export default {
      */
     getExamSubjectType() {
       getSubjectTypeByExamId(this.examId).then(res => {
-        this.subjectTypeData = res.data.data;
+        if (res.data.data) {
+          this.subjectTypeData = res.data.data;
+        }
       });
     },
     /**
      * 设置试卷类型
      */
     setExaminationType() {
-      this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: "正在设置试卷题型..." })
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "正在设置试卷题型..."
+      });
       setExaminationType(this.subjectTypeId, this.examId).then(res => {
         if (res.data.data) {
           this.setExamTypeVisible = false;
           this.getExamSubjectType();
-          this.$store.dispatch("ChangeLayoutStatus", { status: false })
-          this.$message.success("设置题型成功！")
+          this.$store.dispatch("ChangeLayoutStatus", { status: false });
+          this.$message.success("设置题型成功！");
         }
       });
     },
@@ -490,13 +554,29 @@ export default {
       getSubjectType().then(res => {
         this.subjectTypeOptions = res.data.data;
       });
+    },
+    /**
+     * 获取他人与我共享题目信息
+     */
+    getShareWithMeSubjects() {
+      getCommonSubject().then(res => {
+        if(res.data.data) {
+          this.defaultShareSubjects = res.data.data;
+        }        
+      });
     }
   },
+
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.examId = this.$route.query.id;
+    this.examinationName = this.$route.query.name;
     this.getExamSubjectType();
     this.getSubjectListByExam();
+    this.getShareWithMeSubjects();
+    if (this.$route.query.type) {
+      this.editStatus = false;
+    }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
@@ -517,14 +597,22 @@ export default {
 <style lang='scss' scoped>
 //@import url(); 引入公共css类
 .examination-make {
-  .ant-btn {
-    margin-top: 40px;
-  }
   .exam-content {
     padding: 40px;
     .subject-type {
+      overflow: hidden;
       h2 {
         text-align: left;
+      }
+      .ant-btn {
+        float: left;
+        margin-bottom: 20px;
+        margin-left: 10px;
+        background: transparent;
+        border: 0;
+        outline: none;
+        box-shadow: none;
+        color: #1890ff;
       }
       .subject-item {
         .choose-subject {
@@ -606,6 +694,18 @@ export default {
   }
   .ant-input {
     flex: 3;
+  }
+}
+.func_btns {
+  text-align: left;
+  padding: 40px 0 0 40px;
+  .ant-btn {
+    margin-top: 10px;
+  }
+  .print_exam {
+    margin-left: 20px;
+    background: #ff6767;
+    border: 0;
   }
 }
 </style>

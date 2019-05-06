@@ -17,14 +17,10 @@ export function register(account, password) {
 /**
  * 登录
  */
-export function loginByUserName(account, password) {
+export function loginByUserName() {
   return request({
-    url: '/auth/login',
-    method: 'POST',
-    data: {
-      account,
-      password
-    }
+    url: '/auth/loginCAS',
+    method: 'GET'
   })
 }
 

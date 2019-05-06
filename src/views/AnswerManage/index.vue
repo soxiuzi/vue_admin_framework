@@ -62,17 +62,17 @@ export default {
   data() {
     //这里存放数据
     return {
-      tableLoadVisible: false,
-      columns,
-      subjectTypeOptions: [],
-      subjectData: [],
-      editorVisible: false,
-      subjectId: "",
-      editValue: "",
-      defaultValue: "",
-      pagination: {
+      tableLoadVisible: false, // 表格加载状态
+      columns, // 表格表头
+      subjectTypeOptions: [], // 题目类型选项
+      subjectData: [], // 题目信息
+      editorVisible: false, // 编辑模态框
+      subjectId: "", // 题目Id
+      editValue: "", // 答案值
+      defaultValue: "", // 默认答案值
+      pagination: { 
         pageSize: 8
-      }
+      }, // 表格一页显示数
     };
   },
   //监听属性 类似于data概念

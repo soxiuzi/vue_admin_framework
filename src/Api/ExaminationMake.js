@@ -22,3 +22,13 @@ export function updateSubjectInfo(updateInfo) {
     data: updateInfo
   })
 }
+
+/**
+ * 获取他人与我共享的题目信息
+ */
+export function getCommonSubject() {
+  return request({
+    url: '/subject/shareWithMe',
+    method: 'GET'
+  })
+}

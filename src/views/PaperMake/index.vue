@@ -83,13 +83,48 @@
       <span>设置总分：</span>
       <a-input v-model="examinationScore" placeholder="请输入试卷总分"></a-input>
     </div>
-    <div class="common">
-      <span>设置与上次试卷生成的内容相似度：</span>
-      <a-radio-group @change="setSimilarContent" name="radioGroup">
-        <a-radio key="0" value="1">10%</a-radio>
-        <a-radio key="1" value="2">20%</a-radio>
-        <a-radio key="2" value="3">40%</a-radio>
+    <div style="justify-content: flex-start" class="common">
+      <span style="flex: 0.2">设置与上次试卷生成的内容相似度：</span>
+      <a-switch
+        style="margin-left: 20px; margin-right: 20px;"
+        @change="changeSimilarStatus"
+        checkedChildren="开启"
+        unCheckedChildren="关闭"
+        defaultChecked
+      />
+      <a-select
+        v-if="switchStatus"
+        style="flex: 0.2"
+        placeholder="请选择匹配相似度的试卷"
+        @change="chooseSimilarExam"
+      >
+        <a-select-option
+          v-for="exam in examSelectData"
+          :key="exam.id"
+          :value="exam.id"
+        >{{ exam.examinationName }}</a-select-option>
+      </a-select>
+      <a-radio-group
+        v-if="switchStatus"
+        style="flex: 0.3; margin-left: 20px"
+        @change="setSimilarContent"
+        name="radioGroup"
+      >
+        <a-radio key="0" value="0.2">20%</a-radio>
+        <a-radio key="1" value="0.5">50%</a-radio>
+        <a-radio key="2" value="0.8">80%</a-radio>
+        <a-radio key="3" value="customize">自定义</a-radio>
       </a-radio-group>
+      <a-input-number
+        v-if="customizeStatus && switchStatus"
+        :defaultValue="0"
+        :min="1"
+        :max="99"
+        :formatter="value => `${value}%`"
+        :parser="value => value.replace('%', '')"
+        @change="getSimilarValue"
+      />
+      <!-- <a-input type="number" v-model="similarValue" style="flex: 0.2" placeholder="请输入0——100的数值"></a-input>% -->
     </div>
     <a-button type="primary" @click="quickMake" size="large">一键生成</a-button>
   </div>
@@ -102,9 +137,9 @@ import { getSubjectType } from "_api/QuestionManage";
 
 import { getCourseTree } from "_api/CourseManage";
 
-import { autoGenerator } from "_api/PaperMake";
+import { autoGenerator, saveExamInfo } from "_api/PaperMake";
 
-import { createExamination } from "_api/PaperManage";
+import { createExamination, getExaminatiionList } from "_api/PaperManage";
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -112,10 +147,15 @@ export default {
   data() {
     //这里存放数据
     return {
+      switchStatus: true, // 相似度开启开关
+      customizeStatus: false, // 自定义相似度
+      similarValue: "", // 相似度
       examinationName: "", // 试卷名称
       subjectScore: 0, // 题型分数
       subjectAmount: 0, // 题目数量
       subjectFeatures: [], // 试卷特征
+      examSelectData: [], // 匹配相似度试卷信息
+      examId: "", // 匹配相似度的试卷Id
       examinationScore: 0, // 试卷总分
       subjectTypeName: "", // 当前题型名称
       targetSubjectTypeId: "", // 当前题型Id
@@ -134,6 +174,24 @@ export default {
   watch: {},
   //方法集合
   methods: {
+    chooseSimilarExam(value) {
+      this.examId = value;
+      console.log("选择匹配相似度的试卷：", value);
+    },
+    /**
+     * 获取相似度
+     */
+    getSimilarValue(value) {
+      this.similarValue = value / 100;
+      console.log("相似度：", value / 100);
+    },
+    /**
+     * 改变相似度启用状态
+     */
+    changeSimilarStatus(checked) {
+      this.switchStatus = checked;
+      // console.log('开启相似度状态：', checked)
+    },
     /**
      * 设置题型分数
      */
@@ -150,7 +208,12 @@ export default {
      * 设置试卷相似度
      */
     setSimilarContent(e) {
-      console.log("设置相似度", e.target.value);
+      if (e.target.value == "customize") {
+        this.customizeStatus = true;
+      } else {
+        this.similarValue = e.target.value;
+        this.customizeStatus = false; 
+      }
     },
     /**
      * 选择试卷题型
@@ -185,6 +248,7 @@ export default {
      * 一键生成
      */
     quickMake() {
+      let that = this;
       if (this.courseId == "") {
         this.$message.warning("请选择试卷的课程范围！");
       } else if (this.examinationName == "") {
@@ -198,26 +262,42 @@ export default {
           centered: true,
           content: "确定生成该试卷？",
           onOk() {
-            this.$store.dispatch("ChangeLayoutStatus", {
+            that.$store.dispatch("ChangeLayoutStatus", {
               status: true,
               loadText: "试卷自动生成中..."
             });
-            let examInfo = {
-              config: "",
-              examinationId: "",
-              curriculumId: ""
+            let config = {
+              subjectConfigs: that.examConfig
             };
-            createExamination(this.examinationName, this.courseId).then(res => {
-              let examInfo = {
-                examinationId: res.data.data,
-                curriculumId: this.courseId,
-                config: this.examConfig
-              };
-              autoGenerator(examInfo).then(autoRes => {
-                this.$store.dispatch("ChangeLayoutStatus", { status: false });
-                this.$message.success("试卷生成成功！");
+            let examInfo = {
+              curriculumId: that.courseId,
+              config: JSON.stringify(config), 
+              correlation: that.similarValue,
+              compareExaminationId: that.examId
+            };
+            autoGenerator(examInfo)
+              .then(autoRes => {
+                let examData = autoRes.data.data;
+                if (examData.isSuccess) {
+                  console.log('自动生成生成！')
+                  let examInfo = {
+                    examinationName: that.examinationName,
+                    examinationData: examData.examinationData
+                  };
+                  saveExamInfo(examInfo).then(examRes => {
+                    that.$store.dispatch("ChangeLayoutStatus", { status: false });
+                    console.log("保存试卷信息结果：". examInfo.data.data)
+                  }).catch(err => {
+                    that.$store.dispatch("ChangeLayoutStatus", { status: false });
+                  })
+                }else {
+                  that.$store.dispatch("ChangeLayoutStatus", { status: false });
+                  that.$message.success(`${examData.message}`);
+                }
+              })
+              .catch(err => {
+                that.$store.dispatch("ChangeLayoutStatus", { status: false });
               });
-            });
           }
         });
       }
@@ -246,12 +326,21 @@ export default {
         }
       }
       this.courseId = courseArea;
+    },
+    /**
+     * 获取当前用户设置的试卷列表
+     */
+    getExaminatiionList() {
+      getExaminatiionList().then(res => {
+        this.examSelectData = res.data.data;
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
     this.getSubjectType();
     this.getCourseInfo();
+    this.getExaminatiionList();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},

@@ -10,6 +10,7 @@ import './styles/common.scss'
 import '@/icons' // 全局注册svg组件
 import animated from 'animate.css'
 import Print from 'vue-print-nb'
+// import './permission'
 
 Vue.prototype.$axios = Axios
 

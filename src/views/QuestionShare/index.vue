@@ -24,12 +24,12 @@
         :key="subject.id"
         :value="subject.id"
       >{{ subject.subjectTypeName }}</a-radio-button>
-      <!-- <a-radio-button value="b">Shanghai</a-radio-button>
-      <a-radio-button value="c">Beijing</a-radio-button>
-      <a-radio-button value="d">Chengdu</a-radio-button>-->
     </a-radio-group>
     <div title="分享" class="share_btn">
-      <svg-icon title="分享" @onClick="shareSubject" icon-class="share"></svg-icon>
+      <a-button @click="shareSubject">
+        <svg-icon class="share_svg" icon-class="share"></svg-icon>分享
+      </a-button>
+      <!-- <svg-icon title="分享" @onClick="shareSubject" icon-class="share"></svg-icon> -->
     </div>
     <a-table
       bordered
@@ -38,6 +38,7 @@
       :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
       :columns="columns"
       :dataSource="subjectData"
+      :locale="{emptyText: '暂无数据'}"
     />
   </div>
 </template>
@@ -69,17 +70,17 @@ export default {
   data() {
     //这里存放数据
     return {
-      tableLoadingVisible: false,
-      subjectTypes: [],
-      shareVisible: false,
-      currentTypeId: "",
-      subjectData: [],
-      userData: [],
+      tableLoadingVisible: false, // 表格数据加载状态
+      subjectTypes: [], // 题目类型
+      shareVisible: false, // 分享模态框
+      currentTypeId: "", // 当前题目类型Id
+      subjectData: [], // 题目表格数据
+      userData: [], // 初始用户数据
       pagination: {
         pageSize: 5
-      },
-      userIdList: [],
-      columns: columns,
+      }, // 表格每页大小
+      userIdList: [], // 用户列表
+      columns: columns, // 表格表头
       gData: [
         {
           title: "用户列表",
@@ -87,8 +88,8 @@ export default {
           disabled: true,
           children: []
         }
-      ],
-      selectedRowKeys: [],
+      ], // 用户数结构
+      selectedRowKeys: [], // 选择分享的题目信息
       currentPage: 1,
       pageSize: 5
     };
@@ -119,14 +120,17 @@ export default {
      * 分享题目
      */
     confirmShare() {
-      this.$store.dispatch("ChangeLayoutStatus", { status: true, loadText: '题目分享中...'})
+      this.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "题目分享中..."
+      });
       let subjectInfo = {
         ids: this.userIdList.join("-"),
         questionIds: this.selectedRowKeys.join("-")
       };
       shareSubjectInfo(subjectInfo).then(res => {
         if (res.data.data) {
-          this.$store.dispatch("ChangeLayoutStatus", { status: false })
+          this.$store.dispatch("ChangeLayoutStatus", { status: false });
           this.shareVisible = false;
           this.$message.success("分享成功！");
         }
@@ -142,10 +146,12 @@ export default {
         getAllUsers().then(res => {
           let userList = res.data.data;
           for (let i = 0; i < userList.length; i++) {
-            this.gData[0].children.push({
-              title: userList[i].account,
-              key: userList[i].id + "-" + userList[i].account
-            });
+            if (userList[i].account !== this.$store.getters.userName) {
+              this.gData[0].children.push({
+                title: userList[i].account,
+                key: userList[i].id + "-" + userList[i].account
+              });
+            }
           }
         });
       } else {
@@ -159,13 +165,11 @@ export default {
       this.tableLoadingVisible = true;
       this.currentTypeId = e.target.value;
       this.getSubjectInfo();
-      // console.log("选择题目类型：", e.target.value);
     },
     /**
      * 选择分享的题目信息
      */
     onSelectChange(selectedRowKeys) {
-      console.log("选择分享的题目：", selectedRowKeys);
       this.selectedRowKeys = selectedRowKeys;
     },
     /**
@@ -190,7 +194,7 @@ export default {
               subjectId: subjectInfoList[i].id
             });
           }
-          this.tableLoadingVisible = false
+          this.tableLoadingVisible = false;
         }
       });
     }
@@ -217,12 +221,14 @@ export default {
 .question_share {
   padding-top: 40px;
   .share_btn {
-    cursor: pointer;
     font-size: 20px;
     text-align: left;
-    padding: 10px;
-    margin-top: 100px;
+    margin-top: 50px;
+    margin-bottom: 10px;
     width: 30px;
+    .share_svg {
+      margin-right: 5px;
+    }
   }
 }
 .share_content {

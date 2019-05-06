@@ -139,41 +139,35 @@ export default {
   data() {
     //这里存放数据
     return {
-      modalTitle: "",
-      testData: [],
+      modalTitle: "", // 当前添加类型
       addMajorInfo: {
         // 添加专业信息
         parentId: 0,
         sort: "",
         professionalName: "",
         professionalCode: ""
-      },
+      }, // 添加专业信息
       updateMajorInfo: {
-        // 更新专业信息
         id: "",
         sort: 0,
         professionalName: "",
         professionalCode: ""
-      },
+      }, // 更新专业信息 
       deleteCourseInfo: {
-        // 删除课程信息
         professionalId: "",
         curriculumId: "",
         gradeId: ""
-      },
+      },// 删除课程信息
       addCourseInfo: {
-        // 添加课程信息
         professionalId: "", // 专业Id
         curriculumId: "", // 课程Id
         gradeId: "" // 年级Id
-      },
+      },// 添加课程信息
       selectData: [], // 年级选择数据
-      updateVisible: false,
-      addVisible: false,
-      addCourseVisible: false,
-      test: false,
-      value: "",
-      saveId: "",
+      updateVisible: false, // 更新模态框
+      addVisible: false, // 添加模态框
+      addCourseVisible: false, // 添加课程模态框
+      saveId: "", // 
       gradeId: "", // 年级Id
       academySort: "", // 学院排序
       facultySort: "", // 院系排序
@@ -182,14 +176,13 @@ export default {
       facultyId: "", // 院系Id
       major: "", // 专业
       gradeSelect: false, // 年级选择
-      tableLoading: false,
+      tableLoading: false, // 表格加载状态
       pagination: {
         pageSize: 4
-      },
+      },  // 表格每页大小
       courseList: [], // 课程列表
-      treeData: [],
-      treeExpandedKeys: [],
-      dataSource: [],
+      treeData: [], // 树结构数据
+      dataSource: [], // 课程信息
       count: 2,
       columns: [
         {
@@ -206,7 +199,7 @@ export default {
           dataIndex: "operation",
           scopedSlots: { customRender: "operation" }
         }
-      ]
+      ], // 课程表格表头
     };
   },
   //监听属性 类似于data概念

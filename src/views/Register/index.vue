@@ -51,7 +51,12 @@ export default {
       // console.log('用户信息：', this.userInfo)
       // 注册
       register(this.userInfo.username, this.userInfo.password).then(res => {
-        console.log('注册结果：', res.data.data)
+        if(res.data.data) {
+          this.$message.success('注册成功！')
+          this.$router.push({
+            name: 'login'
+          })
+        }
       })
     }
   },

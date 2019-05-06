@@ -108,26 +108,26 @@ export default {
   data() {
     //这里存放数据
     return {
-      addVisible: false,
-      updateVisible: false,
-      modalTitle: "课程",
-      courseId: "",
-      sectionId: "",
-      unitValue: "",
-      gradeSelect: "",
-      treeData: [],
+      addVisible: false, // 添加模态框
+      updateVisible: false, // 更新模态框
+      modalTitle: "课程", // 添加类型
+      courseId: "", // 课程Id
+      sectionId: "", // 章节Id
+      unitValue: "", // 单元值
+      gradeSelect: "", // 年级选择
+      treeData: [], // 树结构数据
       addCourseInfo: {
         parentId: 0,
         curriculumName: "",
         curriculumCode: "",
         initials: ""
-      },
+      }, // 添加课程信息
       updateInfo: {
         id: "",
         curriculumName: "",
         curriculumCode: "",
         initials: ""
-      }
+      } // 更新课程信息
     };
   },
   //监听属性 类似于data概念

@@ -12,7 +12,8 @@ const isPro = process.env.NODE_ENV === 'production'
 const type = process.env.NODE_ENV == 'production' ? envConfig.build.env.TYPE : envConfig.dev.env.TYPE
 
 module.exports = {
-  publicPath: '/', // 基本路径
+  // baseUrl: './',
+  publicPath: './', // 基本路径
   outputDir: 'dist', // 输出目录
   // webpack配置
   chainWebpack: (config) => {

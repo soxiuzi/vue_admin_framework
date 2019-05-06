@@ -64,3 +64,15 @@ export function getSubjectTypeByExamId(examinationId) {
     method: 'GET'
   })
 }
+
+/**
+ * 试卷分享
+ * @param {Object} shareInfo
+ */
+export function shareExam(shareInfo) {
+  return request({
+    url: '/examination/share',
+    method: 'POST',
+    data: shareInfo
+  })
+}

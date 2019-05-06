@@ -3,7 +3,9 @@
     <back-up :visible="loadVisible" :spinText="spinText"></back-up>
     <a-layout>
       <a-layout-sider :collapsed="collapsed">
-        <div style="color: #fff; height: 70px" class="logo">logo区</div>
+        <div style="color: #fff; height: 70px" class="logo">
+          <img src="@/assets/logo1.png">
+        </div>
         <a-menu :defaultSelectedKeys="defaultSelectedKeys" mode="inline" theme="dark">
           <a-menu-item key="1">
             <router-link :to="{ name: 'welcome' }">
@@ -56,9 +58,18 @@
               <router-link :to="{ name: 'papermanage' }">出题组卷管理</router-link>
             </a-menu-item>
             <a-menu-item key="10">
+              <router-link :to="{ name: 'papershare' }">出题组卷分享</router-link>
+            </a-menu-item>
+            <a-menu-item key="11">
               <router-link :to="{ name: 'papermake' }">组卷一键生成</router-link>
             </a-menu-item>
           </a-sub-menu>
+          <!-- <a-menu-item key="12">
+            <router-link :to="{ name: 'accountmanage' }">
+              <a-icon type="database"/>
+              <span>账户管理</span>
+            </router-link>
+          </a-menu-item>-->
         </a-menu>
       </a-layout-sider>
       <a-layout-header
@@ -70,12 +81,14 @@
         <div>
           <a-dropdown>
             <div class="userInfo">
-              <a-avatar :size="32" icon="user"/>
-              <span class="username">管理员</span>
+              <!-- <a-avatar :size="32" icon="user"/> -->
+              <svg-icon icon-class="manage_user"></svg-icon>
+              <span class="username">{{ userName }}</span>
             </div>
             <a-menu slot="overlay">
               <a-menu-item>
-                <router-link :to="{ name: 'login' }">登出</router-link>
+                <span @click="logout">登出</span>
+                <!-- <router-link :to="{ name: 'login' }">登出</router-link> -->
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -105,7 +118,7 @@
 //例如：import 《组件名称》 from '《组件路径》';
 import { PAGEBREAD } from "@/var/pageBread.js";
 import Header from "_com/Header";
-import BackUp from "_com/BackUp"
+import BackUp from "_com/BackUp";
 import { setTimeout } from "timers";
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -114,7 +127,7 @@ export default {
     //这里存放数据
     return {
       transitionName: "",
-      currentPath: "",
+      currentPath: "/welcome",
       explain: "",
       currentPage: "",
       defaultSelectedKeys: ["1"],
@@ -125,10 +138,13 @@ export default {
   //监听属性 类似于data概念
   computed: {
     loadVisible() {
-      return this.$store.getters.layoutStatus
+      return this.$store.getters.layoutStatus;
     },
     spinText() {
-      return this.$store.getters.loadText
+      return this.$store.getters.loadText;
+    },
+    userName() {
+      return this.$store.getters.userName;
     }
   },
   //监控data中的数据变化
@@ -145,20 +161,22 @@ export default {
   },
   //方法集合
   methods: {
-    logout() {
-      this.$router.push({
-        name: "login"
-      });
-    },
     toggleCollapsed() {
       this.collapsed = !this.collapsed;
+    },
+    logout() {
+      this.$store.dispatch("LogOut").then(res => {
+        if (res) {
+          this.$router.push({ path: "/login" });
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    // console.log('获取token：', this.$store.getter)
-    // this.currentPath = this.$route.path;
-    // console.log("当前路由：", this.currentPath);
+    if (!this.$store.getters.token) {
+      this.$router.push({ path: "/login" });
+    }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
@@ -186,6 +204,9 @@ export default {
         this.explain = item.explain;
       }
     });
+    if (!this.$store.getters.token) {
+      this.$router.push({ path: "/login" });
+    }
   }, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
   destroyed() {}, //生命周期 - 销毁完成
@@ -227,11 +248,28 @@ export default {
     .username {
       margin-left: 10px;
     }
+    .userInfo {
+      font-size: 18px;
+    }
   }
   .ant-layout-sider {
     position: fixed;
     left: 0;
     height: 100vh;
+    .logo {
+      background: #ffffff;
+      padding: 15px;
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .ant-menu-item {
+      text-align: left;
+    }
+    .ant-menu-submenu {
+      text-align: left;
+    }
   }
 }
 </style>
