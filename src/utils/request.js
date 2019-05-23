@@ -2,19 +2,29 @@ import axios from 'axios'
 import store from '../store'
 import { message } from 'ant-design-vue'
 
-const config = require('../../config/index.js')
+const devConfig = require('../../config/dev.env')
+const proConfig = require('../../config/pro.env')
 
 const durationTime = 3 * 1000
 
+let targeUrl = ''
+
+if(process.env.NODE_ENV === devConfig.NODE_ENV) {
+  targeUrl = devConfig.requestUrl
+}else if(process.env.NODE_ENV === proConfig.NODE_ENV) {
+  targeUrl = proConfig.requestUrl
+}
+
 const whiteList = [
-  'http://192.168.1.112:8082/auth/login'
+  `${targeUrl}/auth/login`
 ]; // 请求白名单
 
 // process.env.NODE_ENV == 'production' ? config.build.env.Base_url : config.dev.env.Base_url
 
 // 创建axios实例
 let service = axios.create({
-  baseURL: 'http://192.168.1.112:8082',
+  // baseURL: 'http://172.16.213.30:8082',
+   baseURL: targeUrl,
   // 请求超时时间
   timeout: 50000,
   // 跨域是否需要凭证
@@ -33,7 +43,7 @@ service.interceptors.request.use(
       config.withCredentials = true
     } 
     // 设置自定义请求头
-    config.header = {
+    config.header = { 
       'X-Requested-With': 'XMLHttpRequest'
     }
     // 最大重定向数
@@ -48,10 +58,14 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-  response => response,
+  response => {
+    // console.log('正确响应：', response.status)
+    return response
+  },
   error => {
+    // console.log('错误响应：', error)
     return new Promise((resolve, reject) => {
-      // console.log(error.response)
+      // console.log('响应：', error)
       if (error.response == null) {
         message.warning('网络异常', 'error', durationTime)
         reject(error)
@@ -71,6 +85,8 @@ service.interceptors.response.use(
           case 403:
             message.warning('无权访问', 'warning', durationTime)
             break
+          case 302:
+            window.location.assign(error.response.Location)
         }
       }
     })

@@ -66,9 +66,9 @@ export default {
       //   console.log('注册结果：', res)
       // })
       // 登录
-      // loginByUserName(this.username, this.password).then(res => {
-      //   console.log('登录结果：', res)
-      // })
+      loginByUserName(this.username, this.password).then(res => {
+        console.log('登录结果：', res)
+      })
       // this.$router.push({
       //   name: "index"
       // });
@@ -76,9 +76,13 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    let loginInfo = {
+      url: this.$route.query.targetUrl,
+      ticket: this.$route.query.ticket
+    }
     let token = this.$store.getters.token;
     if (!token) {
-      this.$store.dispatch("LoginByUsername").then(res => {
+      this.$store.dispatch("LoginByUsername", loginInfo).then(res => {
         res && this.$router.push({ name: "index" });
       });
     }

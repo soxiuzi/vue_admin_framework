@@ -1,4 +1,4 @@
-const envConfig = require('./config')
+// const envConfig = require('./config')
 const path = require('path')
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
@@ -9,10 +9,9 @@ function resolve (dir) {
 
 const isPro = process.env.NODE_ENV === 'production'
 
-const type = process.env.NODE_ENV == 'production' ? envConfig.build.env.TYPE : envConfig.dev.env.TYPE
+// const type = process.env.NODE_ENV == 'production' ? envConfig.build.env.TYPE : envConfig.dev.env.TYPE
 
 module.exports = {
-  // baseUrl: './',
   publicPath: './', // 基本路径
   outputDir: 'dist', // 输出目录
   // webpack配置

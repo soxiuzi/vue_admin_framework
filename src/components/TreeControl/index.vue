@@ -1,5 +1,5 @@
 <template>
-  <a-tree @select="onSelect" :treeData="treeData" showIcon>
+  <a-tree @rightClick="rightClick" @select="onSelect" :treeData="treeData" showIcon>
     <svg-icon slot="dir" icon-class="menu"></svg-icon>
     <svg-icon slot="major" icon-class="major"></svg-icon>
   </a-tree>
@@ -31,6 +31,9 @@ export default {
   methods: {
     onSelect(keys) {
       this.$emit("select-key", keys);
+    },
+    rightClick(e) {
+      this.$emit("rightClick", e)
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

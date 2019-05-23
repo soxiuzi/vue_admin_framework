@@ -9,6 +9,19 @@
       v-model="setUpdateSubjectVisible"
       @ok="updateSubject"
     >
+      <div class="choice_chapter">
+        <span>选择题目所属的章节范围：</span>
+        <div class="chapter_area">
+          <a-checkbox
+            :indeterminate="indeterminate"
+            @change="onCheckAllChange"
+            :checked="checkAll"
+          >全选</a-checkbox>
+          <a-checkbox-group :options="plainOptions" v-model="checkedList" @change="onChange">
+            <span style="color: red" slot="label" slot-scope="{value}">{{value}}</span>
+          </a-checkbox-group>
+        </div>
+      </div>
       <div v-if="currentSubjectInfo.questionType == 1" class="choice-edit">
         <div class="subject-title__update">
           <span>修改题目描述：</span>
@@ -111,12 +124,17 @@
           <a-select-option :key="index" value="B">B</a-select-option>
           <a-select-option :key="index" value="C">C</a-select-option>
           <a-select-option :key="index" value="D">D</a-select-option>
+          <a-select-option :key="index" value="E">E</a-select-option>
+          <a-select-option :key="index" value="F">F</a-select-option>
+          <a-select-option :key="index" value="G">G</a-select-option>
+          <a-select-option :key="index" value="H">H</a-select-option>
+          <a-select-option :key="index" value="I">I</a-select-option>
         </a-select>
         <div @click="deleteOption(index)">
           <svg-icon class="delete_icon" icon-class="delete"></svg-icon>
         </div>
       </div>
-      <a-button class="add_btn" @click="addOption" type="primary">添加选项</a-button>
+      <a-button v-if="optionStatus" class="add_btn" @click="addOption" type="primary">添加选项</a-button>
     </a-modal>
     <div class="select_course">
       <span>选择题目所属课程：</span>
@@ -135,9 +153,22 @@
         :key="index"
       >{{ radio.name }}</a-radio-button>
     </a-radio-group>
-    <a-button @click="showSubjectModal">
-      <svg-icon icon-class="add"></svg-icon>添加题目
-    </a-button>
+    <div class="addBtn">
+      <a-button @click="showSubjectModal">
+        <svg-icon icon-class="add"></svg-icon>添加题目
+      </a-button>
+      <div style="text-align: left; display: flex" v-if="courseId" class="question">
+        <a-button @click="downloadTemplate">
+          <a-icon type="upload"/>下载题目模板
+        </a-button>
+        <!-- <a style="color: skyblue" href="http://www.baidu.com">下载题目模板</a> -->
+        <a-upload :showUploadList="false" :action="actionUrl" @change="addSubjectByExcel">
+          <a-button>
+            <a-icon type="upload"/>批量上传题目
+          </a-button>
+        </a-upload>
+      </div>
+    </div>
     <a-table
       :loading="{ spinning: loadStatus, tip: '数据加载中...' }"
       bordered
@@ -159,11 +190,12 @@ import { getCourseTree } from "_api/CourseManage";
 import { getSubjectType, addSubjectInfo } from "_api/QuestionManage";
 import { getSubjectList } from "_api/QuestionShare";
 import { updateSubjectInfo } from "_api/ExaminationMake";
-import { filter } from 'minimatch';
+import { filter } from "minimatch";
+import { constants } from "crypto";
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 const plainOptions = [];
-const defaultCheckedList = [];
+let defaultCheckedList = [];
 
 export default {
   //import引入的组件需要注入到对象中才能使用
@@ -173,10 +205,12 @@ export default {
   data() {
     //这里存放数据
     return {
+      optionStatus: true, // 添加选项按钮
       checkedList: defaultCheckedList,
       indeterminate: true,
       checkAll: false,
       plainOptions,
+      actionUrl: "", // 批量上传题目地址
       courseId: "", // 课程Id
       currentSubjectInfo: {}, // 当前题目信息
       courseInfo: [], // 课程信息
@@ -220,16 +254,38 @@ export default {
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    userId() {
+      return this.$store.getters.userId;
+    }
+  },
   //监控data中的数据变化
   watch: {},
   //方法集合
   methods: {
+    /**
+     * 下载题目模板
+     */
+    downloadTemplate() {
+      window.open('http://172.16.213.31:8001/')
+    },
+    /**
+     * 批量添加题目（导入excel）
+     */
+    addSubjectByExcel(info) {
+      if (this.courseId) {
+        if (info.file.status !== "uploading") {
+          console.log(info.file, info.fileList);
+        }
+        if (info.file.status === "done") {
+          this.$message.success(`${info.file.name} file uploaded successfully`);
+        } else if (info.file.status === "error") {
+          this.$message.error(`${info.file.name} file upload failed.`);
+        }
+      }
+    },
     onChange(checkedList) {
-      this.indeterminate =
-        !!checkedList.length && checkedList.length < plainOptions.length;
-      this.checkAll = checkedList.length === plainOptions.length;
-      console.log(this.checkedList);
+      this.checkAll = checkedList.length === this.plainOptions.length;
     },
     /**
      * 选择章节
@@ -256,6 +312,9 @@ export default {
      */
     chooseCourse(value) {
       this.courseId = value;
+      this.actionUrl = `http://192.168.1.112:8082/subject/uploadSubjects?userId=${
+        this.userId
+      }&curriculumId=${value}`;
       this.plainOptions = [];
       let chapterInfo = this.courseInfo.filter(item => item.id == value)[0]
         .children;
@@ -276,6 +335,7 @@ export default {
      * 显示更新信息模态框
      */
     showEditVisible(subjectInfo) {
+      this.checkedList = JSON.parse(subjectInfo.typeGroup);
       this.setUpdateSubjectVisible = true;
       this.currentSubjectInfo = {
         id: subjectInfo.id,
@@ -301,6 +361,7 @@ export default {
         });
       }
       let updateInfo = {
+        features: this.checkedList,
         options: options,
         question: this.currentSubjectInfo.question,
         subjectId: this.currentSubjectInfo.id
@@ -321,6 +382,10 @@ export default {
     addOption() {
       let currentSubjectId = this.subjectTypeId;
       if (currentSubjectId == 1) {
+        if (this.choiceOptions.length == 9) {
+          this.optionStatus = false;
+          console.log("添加时当前长度：", this.choiceOptions.length);
+        }
         this.choiceOptions.push({
           value: "",
           option: ""
@@ -328,7 +393,6 @@ export default {
       } else if (currentSubjectId == 2) {
         this.judgeOptions.push("");
       }
-
     },
     /**
      * 获取题目信息
@@ -343,15 +407,21 @@ export default {
             item => item.curriculumId == this.courseId
           );
           for (let i = 0; i < filterData.length; i++) {
-            let subjectArea = [],
-                defaultArea = JSON.parse(filterData[i].typeGroup);
-            defaultArea.map(item => {
-              for(let i = 0; i < this.plainOptions.length; i++) {
-                if(item == this.plainOptions[i].value) {
-                  subjectArea.push(this.plainOptions[i].label)
+            let subjectArea = [];
+            if (filterData[i].typeGroup) {
+              let defaultArea = JSON.parse(filterData[i].typeGroup);
+
+              defaultArea.map(item => {
+                for (let i = 0; i < this.plainOptions.length; i++) {
+                  if (item == this.plainOptions[i].value) {
+                    subjectArea.push(this.plainOptions[i].label);
+                  }
                 }
-              }
-            })
+              });
+            } else {
+              subjectArea = [];
+            }
+
             this.dataSource.push({
               key: filterData[i].id,
               index: i + 1,
@@ -380,6 +450,7 @@ export default {
     deleteOption(index) {
       let currentSubjectId = this.subjectTypeId;
       if (currentSubjectId == 1) {
+        this.optionStatus = true;
         this.choiceOptions.splice(index, 1);
       } else if (currentSubjectId == 2) {
         this.judgeOptions.splice(index, 1);
@@ -562,7 +633,7 @@ export default {
     }
   }
   .ant-radio-group {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     margin-top: 20px;
   }
   .ant-btn {

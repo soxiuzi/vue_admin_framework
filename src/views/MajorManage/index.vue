@@ -1,13 +1,18 @@
 <template>
   <div class="course_manage">
-    <a-modal
-      :title="`添加${modalTitle}`"
-      v-model="addVisible"
-      centered
-      okText="提交"
-      cancelText="取消"
-      @ok="addMajor"
-    >
+    <div ref="utils" class="utils" :style="{ top: utilsTop, left: utilsLeft }" v-if="firstStatus">
+      <a-button @click="showModalForUpdate" size="small" type="primary">
+        <svg-icon icon-class="edit_major"></svg-icon>编辑
+      </a-button>
+      <a-button @click="deleteMajor" size="small" type="primary">
+        <svg-icon icon-class="delete_major"></svg-icon>删除
+      </a-button>
+      <a-button @click="showModalForAdd" size="small" type="primary">
+        <svg-icon icon-class="add_major"></svg-icon>添加
+      </a-button>
+    </div>
+
+    <a-modal :title="`添加`" v-model="addVisible" centered okText="提交" cancelText="取消" @ok="addMajor">
       <a-input v-model="addMajorInfo.professionalName" :placeholder="`请输入${modalTitle}名称`"></a-input>
     </a-modal>
     <a-modal
@@ -46,10 +51,12 @@
     </a-modal>
     <div class="choose_major">
       <div class="addAcademy">
-        <a-button @click="showModalForAdd('course')" size="large" type="primary">添加学院</a-button>
+        <span @click="showModalForAdd('course')">+添加学院</span>
+        <!-- <a-button @click="showModalForAdd('course')" size="large" type="primary">+添加学院</a-button> -->
       </div>请先选择您的专业：
-      <tree-control @select-key="onSelect" :tree-data="treeData"></tree-control>
+      <tree-control @rightClick="rightClick" @select-key="onSelect" :tree-data="treeData"></tree-control>
     </div>
+    <div class="seat" :style="{flex: (academyId || facultyId || gradeSelect) ? 0 : 4}"></div>
     <transition
       name="fade"
       enter-active-class="slideInRight"
@@ -57,16 +64,27 @@
       mode="out-in"
     >
       <div v-if="academyId" class="function academy animated">
-        <a-button @click="showModalForUpdate" size="large" type="primary">修改学院名称</a-button>
-        <a-button @click="deleteMajor" size="large" type="primary">删除学院</a-button>
-        <a-button @click="showModalForAdd" size="large" type="primary">添加院系</a-button>
+        <!-- <a-button @click="showModalForUpdate" size="small" type="primary">
+          <svg-icon icon-class="edit_major"></svg-icon>编辑
+        </a-button>
+        <a-button @click="deleteMajor" size="small" type="primary">
+          <svg-icon icon-class="delete_major"></svg-icon>删除
+        </a-button>
+        <a-button @click="showModalForAdd" size="small" type="primary">
+          <svg-icon icon-class="add_major"></svg-icon>添加
+        </a-button>-->
       </div>
-      <div v-else-if="facultyId" class="function academy animated">
-        <a-button @click="showModalForUpdate" size="large" type="primary">修改院系名称</a-button>
-        <a-button @click="deleteMajor" size="large" type="primary">删除院系</a-button>
-        <a-button @click="showModalForAdd" size="large" type="primary">添加专业</a-button>
+      <div v-if="facultyId" class="function faculty academy animated">
+        <!-- <a-button @click="showModalForUpdate" size="small" type="primary">编辑</a-button>
+        <a-button @click="deleteMajor" size="small" type="primary">删除</a-button>
+        <a-button @click="showModalForAdd" size="small" type="primary">添加</a-button>-->
       </div>
-      <div v-else-if="gradeSelect" class="function animated">
+      <div v-if="gradeSelect" class="function animated">
+        <div class="major_edit">
+          <span>名称编辑：</span>
+          <a-button class="course_add" size="small" @click="showModalForUpdate"><svg-icon icon-class="edit_major"></svg-icon>编辑</a-button>
+          <a-button class="course_add" size="small" @click="deleteMajor"><svg-icon icon-class="delete_major"></svg-icon>删除</a-button>
+        </div>
         <div class="choose_grade">
           <span>选择年级：</span>
           <a-select
@@ -82,11 +100,9 @@
               :value="grade.id"
             >{{ grade.gradeName }}</a-select-option>
           </a-select>
+          <a-button class="course_add" @click="showAddCourseModal">添加课程</a-button>
         </div>
         <div class="course_table">
-          <a-button class="course_add" @click="showModalForUpdate">修改专业名称</a-button>
-          <a-button class="course_add" @click="deleteMajor">删除专业</a-button>
-          <a-button class="course_add" @click="showAddCourseModal">添加课程</a-button>
           <a-table
             @change="pageChange"
             :loading="tableLoading"
@@ -139,6 +155,8 @@ export default {
   data() {
     //这里存放数据
     return {
+      utilsLeft: "",
+      utilsTop: "",
       modalTitle: "", // 当前添加类型
       addMajorInfo: {
         // 添加专业信息
@@ -152,22 +170,22 @@ export default {
         sort: 0,
         professionalName: "",
         professionalCode: ""
-      }, // 更新专业信息 
+      }, // 更新专业信息
       deleteCourseInfo: {
         professionalId: "",
         curriculumId: "",
         gradeId: ""
-      },// 删除课程信息
+      }, // 删除课程信息
       addCourseInfo: {
         professionalId: "", // 专业Id
         curriculumId: "", // 课程Id
         gradeId: "" // 年级Id
-      },// 添加课程信息
+      }, // 添加课程信息
       selectData: [], // 年级选择数据
       updateVisible: false, // 更新模态框
       addVisible: false, // 添加模态框
       addCourseVisible: false, // 添加课程模态框
-      saveId: "", // 
+      saveId: "", //
       gradeId: "", // 年级Id
       academySort: "", // 学院排序
       facultySort: "", // 院系排序
@@ -179,7 +197,7 @@ export default {
       tableLoading: false, // 表格加载状态
       pagination: {
         pageSize: 4
-      },  // 表格每页大小
+      }, // 表格每页大小
       courseList: [], // 课程列表
       treeData: [], // 树结构数据
       dataSource: [], // 课程信息
@@ -199,11 +217,18 @@ export default {
           dataIndex: "operation",
           scopedSlots: { customRender: "operation" }
         }
-      ], // 课程表格表头
+      ] // 课程表格表头
     };
   },
   //监听属性 类似于data概念
-  computed: {},
+  computed: {
+    firstStatus() {
+      return this.$store.getters.firstStatus;
+    },
+    secondStatus() {
+      return this.$store.getters.secondStatus;
+    }
+  },
   //监控data中的数据变化
   watch: {
     major(val) {
@@ -212,6 +237,52 @@ export default {
   },
   //方法集合
   methods: {
+    rightClick(e) {
+      let that = this;
+      that.utilsTop = e.event.clientY - 5 + 'px';
+      that.utilsLeft = e.event.clientX - 165 + 'px';
+
+      let selectKey = JSON.parse(e.node.eventKey);
+      if (selectKey.type === "firstDir") {
+        this.$store.dispatch("ChangeFirstStatus", true);
+        this.addMajorInfo.parentId = selectKey.id;
+        this.addMajorInfo.sort = selectKey.length;
+        this.updateMajorInfo.sort = selectKey.sort;
+        this.academyId = selectKey.id;
+        this.saveId = selectKey.id;
+        this.facultyId = "";
+        this.major = "";
+        this.modalTitle = "学院";
+      } else if (selectKey.type === "secondDir") {
+        this.$store.dispatch("ChangeFirstStatus", true);
+        this.addMajorInfo.parentId = selectKey.id;
+        this.addMajorInfo.sort = selectKey.length;
+        this.updateMajorInfo.sort = selectKey.sort;
+        this.facultyId = selectKey.id;
+        this.saveId = selectKey.id;
+        this.academyId = "";
+        this.major = "";
+        this.modalTitle = "院系";
+      } else if (selectKey.type === "thirdDir") {
+        this.addMajorInfo.parentId = selectKey.id;
+        this.addMajorInfo.sort = selectKey.length;
+        this.updateMajorInfo.sort = selectKey.sort;
+        this.major = selectKey.id;
+        this.saveId = selectKey.id;
+        this.academyId = "";
+        this.facultyId = "";
+        this.modalTitle = "专业";
+      } else {
+        this.addMajorInfo.parentId = "";
+        this.addMajorInfo.sort = "";
+        this.updateMajorInfo.sort = "";
+        this.academyId = "";
+        this.saveId = 0;
+        this.facultyId = "";
+        this.major = "";
+        this.modalTitle = "";
+      }
+    },
     /**
      * 添加课程
      */
@@ -264,7 +335,7 @@ export default {
       this.addMajorInfo.parentId = this.saveId;
       if (this.saveId === 0) {
         this.addMajorInfo.sort = this.academySort;
-      } 
+      }
       addMajor(this.addMajorInfo).then(res => {
         if (res.data.data) {
           this.initData();
@@ -278,7 +349,7 @@ export default {
      * 删除专业项
      */
     deleteMajor() {
-      let that = this
+      let that = this;
       this.$confirm({
         title: "删除操作",
         content: "确定删除？",
@@ -294,9 +365,9 @@ export default {
               that.initData();
               that.$store.dispatch("ChangeLayoutStatus", { status: false });
               that.$message.success("删除成功！");
-              that.facultyId = ""
-              that.academyId = ""
-              that.gradeSelect = false
+              that.facultyId = "";
+              that.academyId = "";
+              that.gradeSelect = false;
             }
           });
         }
@@ -350,7 +421,6 @@ export default {
     onSelect(keys) {
       if (keys.length) {
         let selectKey = JSON.parse(keys[0]);
-        // console.log("选择的keys:", selectKey);
         if (selectKey.type === "firstDir") {
           this.addMajorInfo.parentId = selectKey.id;
           this.addMajorInfo.sort = selectKey.length;
@@ -465,7 +535,11 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    let that = this;
     this.initData();
+    window.addEventListener("click", function() {
+      that.$store.dispatch("ChangeFirstStatus", false);
+    });
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -484,27 +558,102 @@ export default {
   display: flex;
   background: #fff;
   min-height: calc(93vh - 180px);
+  .utils {
+    position: absolute;
+    z-index: 9999;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    background: url("../.../../../assets/majorManage/kuang.png");
+    background-size: 100% 100%;
+    .ant-btn {
+      font-size: 13px;
+      margin-top: 5px;
+      margin-left: 5px;
+      &:first-child {
+        background: #1890ff;
+      }
+      &:nth-of-type(2) {
+        background: #f9645d;
+        box-shadow: none;
+        outline: none;
+        border: none;
+      }
+      &:nth-of-type(3) {
+        background: #4fd083;
+        box-shadow: none;
+        outline: none;
+        border: none;
+      }
+    }
+  }
   .choose_major {
     border-right: 2px solid #ccc;
     box-sizing: border-box;
-    padding-top: 100px;
+    padding-top: 30px;
     flex: 1;
     .addAcademy {
-      margin-bottom: 70px;
+      text-align: left;
+      box-sizing: border-box;
+      margin-left: 103px;
+      margin-bottom: 30px;
+      font-size: 18px;
+      span {
+        color: #1890ff;
+        cursor: pointer;
+      }
     }
+  }
+  .seat {
+    flex: 4;
   }
   .academy {
     display: flex;
-    justify-content: center;
+    padding-top: 170px !important;
+    .ant-btn {
+      font-size: 16px;
+      &:first-child {
+        background: #1890ff;
+      }
+      &:nth-of-type(2) {
+        background: #f9645d;
+        box-shadow: none;
+        outline: none;
+        border: none;
+      }
+      &:nth-of-type(3) {
+        background: #4fd083;
+        box-shadow: none;
+        outline: none;
+        border: none;
+      }
+    }
+  }
+  .faculty {
     padding-top: 200px !important;
-    // align-items: center;
   }
   .function {
     flex: 4;
     box-sizing: border-box;
     padding: 100px 20px 0;
+    text-align: left;
+    .major_edit {
+      margin: 15px 0;
+      .ant-btn {
+        color: #ffffff;
+        &:nth-of-type(1) {
+          background: #1890FF;
+          margin-left: 0;
+        }
+        &:nth-of-type(2) {
+          background: #F9645D;
+        }
+      }
+    }
     .ant-btn {
-      margin-left: 50px;
+      &:nth-of-type(1), &:nth-of-type(2) {
+        margin-left: 20px;
+      }
     }
     .course_table {
       overflow: hidden;

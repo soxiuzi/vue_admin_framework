@@ -1,5 +1,27 @@
 <template>
   <div class="paper_make">
+    <a-modal
+      :centered="true"
+      okText="生成"
+      cancelText="取消"
+      title="试卷自动生成"
+      v-model="examMakeVisible"
+      @ok="quickMake"
+    >
+      <p
+        style="color: rgb(206, 22, 32)"
+        v-for="(subjectType, index) in subjectTypeValue"
+        :key="index"
+      >
+        {{
+        (subjectType == 1 && `选择题分数：${examConfig[subjectType].totalScore}`) ||
+        (subjectType == 2 && `填空题题分数：${examConfig[subjectType].totalScore}`) ||
+        (subjectType == 3 && `判断题分数：${examConfig[subjectType].totalScore}`) ||
+        (subjectType == 4 && `简答题分数：${examConfig[subjectType].totalScore}`)
+        }}
+      </p>
+      <p style="color: rgb(206, 22, 32)">试卷总分：{{ examConfig | getSumScore }}</p>
+    </a-modal>
     <div class="choose-course common">
       <span>选择试卷的课程范围：</span>
       <a-radio-group @change="chooseCourse" name="radioGroup">
@@ -16,73 +38,78 @@
     </div>
     <div class="common">
       <span>设置题型：</span>
-      <a-checkbox-group @change="chooseSubjectType">
-        <a-row>
-          <a-col v-for="checkbox in subjectTypeOptions" :key="checkbox.id" :span="24">
-            <a-checkbox :value="checkbox.id">{{ checkbox.subjectTypeName }}</a-checkbox>
-          </a-col>
-        </a-row>
-      </a-checkbox-group>
-      <div v-if="subjectTypeValue.length" class="setCourseArea">
-        <div class="type-config">
-          <span>
-            设置
-            <strong style="color: #ce1620">{{ subjectTypeName }}</strong>总分：
-          </span>
-          <a-input @change="getSubjectScore" v-model="subjectScore"></a-input>
-        </div>
-        <div class="type-config">
-          <span>
-            设置
-            <strong style="color: #ce1620">{{ subjectTypeName }}</strong>题目数量：
-          </span>
-          <a-input @change="getsubjectAmount" v-model="subjectAmount"></a-input>
-        </div>
-        <div class="type-config">
-          <span>
-            设置
-            <strong style="color: #ce1620">{{ subjectTypeName }}</strong>考察的章节范围：
-          </span>
-          <a-tree-select
-            showSearch
-            style="width: 300px"
-            :value="subjectFeatures"
-            :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
-            placeholder="请选择考察的章节范围"
-            allowClear
-            multiple
-            @change="onChange"
-          >
-            <a-tree-select-node
-              v-for="(course, firstIndex) in treeData"
-              :key="course.id"
-              :value="course.id"
-              :title="course.curriculumName"
+      <div class="subject_type_content">
+        <a-checkbox-group @change="chooseSubjectType">
+          <a-row>
+            <a-col v-for="checkbox in subjectTypeOptions" :key="checkbox.id" :span="24">
+              <a-checkbox :value="checkbox.id">{{ checkbox.subjectTypeName }}</a-checkbox>
+            </a-col>
+          </a-row>
+        </a-checkbox-group>
+        <a-radio-group size="small" @change="setSubjectType" name="radioGroup">
+          <a-radio-button :style="radioStyle" v-for="type in types" :key="type.value" :value="type.value">{{ type.name }}</a-radio-button>
+        </a-radio-group>
+        <div style="flex: 4" v-if="currentSubjectType && subjectTypeValue.length" class="setCourseArea">
+          <div class="type-config">
+            <span>
+              设置
+              <strong style="color: #ce1620">{{ subjectTypeName }}</strong>总分：
+            </span>
+            <a-input @change="getSubjectScore" v-model="subjectScore"></a-input>
+          </div>
+          <div class="type-config">
+            <span>
+              设置
+              <strong style="color: #ce1620">{{ subjectTypeName }}</strong>题目数量：
+            </span> 
+            <a-input @change="getsubjectAmount" v-model="subjectAmount"></a-input>
+          </div>
+          <div class="type-config">
+            <span>
+              设置
+              <strong style="color: #ce1620">{{ subjectTypeName }}</strong>考察的章节范围：
+            </span>
+            <a-tree-select
+              showSearch
+              style="width: 300px"
+              :value="subjectFeatures"
+              :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
+              placeholder="请选择考察的章节范围"
+              allowClear
+              multiple
+              @change="onChange"
             >
-              <template v-if="course.children">
-                <a-tree-select-node
-                  v-for="(secondTree, index) in course.children"
-                  :key="secondTree.id"
-                  :value="secondTree.id"
-                  :title="secondTree.curriculumName"
-                >
+              <a-tree-select-node
+                v-for="(course, firstIndex) in treeData"
+                :key="course.id"
+                :value="course.id"
+                :title="course.curriculumName"
+              >
+                <template v-if="course.children">
                   <a-tree-select-node
-                    v-for="(thirdTree, index) in secondTree.children"
-                    :key="thirdTree.id"
-                    :value="thirdTree.id"
-                    :title="thirdTree.curriculumName"
-                  ></a-tree-select-node>
-                </a-tree-select-node>
-              </template>
-            </a-tree-select-node>
-          </a-tree-select>
+                    v-for="(secondTree, index) in course.children"
+                    :key="secondTree.id"
+                    :value="secondTree.id"
+                    :title="secondTree.curriculumName"
+                  >
+                    <a-tree-select-node
+                      v-for="(thirdTree, index) in secondTree.children"
+                      :key="thirdTree.id"
+                      :value="thirdTree.id"
+                      :title="thirdTree.curriculumName"
+                    ></a-tree-select-node>
+                  </a-tree-select-node>
+                </template>
+              </a-tree-select-node>
+            </a-tree-select>
+          </div>
         </div>
       </div>
     </div>
-    <div class="common">
+    <!-- <div class="common">
       <span>设置总分：</span>
       <a-input v-model="examinationScore" placeholder="请输入试卷总分"></a-input>
-    </div>
+    </div>-->
     <div style="justify-content: flex-start" class="common">
       <span style="flex: 0.2">设置与上次试卷生成的内容相似度：</span>
       <a-switch
@@ -90,7 +117,6 @@
         @change="changeSimilarStatus"
         checkedChildren="开启"
         unCheckedChildren="关闭"
-        defaultChecked
       />
       <a-select
         v-if="switchStatus"
@@ -126,7 +152,7 @@
       />
       <!-- <a-input type="number" v-model="similarValue" style="flex: 0.2" placeholder="请输入0——100的数值"></a-input>% -->
     </div>
-    <a-button type="primary" @click="quickMake" size="large">一键生成</a-button>
+    <a-button type="primary" @click="showMakeModal" size="large">一键生成</a-button>
   </div>
 </template>
 
@@ -147,7 +173,10 @@ export default {
   data() {
     //这里存放数据
     return {
-      switchStatus: true, // 相似度开启开关
+      examMakeVisible: false, // 试卷生成模态框
+      currentSubjectType: "", // 设置当前题目类型信息
+      types: [], // 已选择题型
+      switchStatus: false, // 相似度开启开关
       customizeStatus: false, // 自定义相似度
       similarValue: "", // 相似度
       examinationName: "", // 试卷名称
@@ -165,15 +194,49 @@ export default {
       subjectTypeName: "", // 题型名
       subjectTypeValue: [], // 设置的题目题型
       subjectTypeOptions: [], // 题型信息
-      examConfig: {} // 试卷配置
+      examConfig: {}, // 试卷配置
+      radioStyle: {
+        display: 'block',
+        width: '120px',
+        height: '30px',
+        lineHeight: '30px',
+      },
     };
   },
   //监听属性 类似于data概念
   computed: {},
+  // 注册局部过滤器
+  filters: {
+    getSumScore(value) {
+      let sumScore = 0;
+      for (let key in value) {
+        sumScore += parseInt(value[key].totalScore);
+      }
+      return sumScore;
+    }
+  },
   //监控data中的数据变化
   watch: {},
   //方法集合
   methods: {
+    /**
+     * 设置题型内容
+     */
+    setSubjectType(e) {
+      this.subjectFeatures = [];
+      this.currentSubjectType = e.target.value;
+      this.subjectScore = this.examConfig[this.currentSubjectType].totalScore;
+      this.subjectAmount = this.examConfig[
+        this.currentSubjectType
+      ].subjectAmount;
+      this.subjectFeatures = this.examConfig[this.currentSubjectType].features;
+      this.subjectTypeName = this.types.filter(
+        item => item.value == e.target.value
+      )[0].name;
+    },
+    /**
+     * 选择相似度的试卷
+     */
     chooseSimilarExam(value) {
       this.examId = value;
       console.log("选择匹配相似度的试卷：", value);
@@ -196,13 +259,15 @@ export default {
      * 设置题型分数
      */
     getSubjectScore(e) {
-      this.examConfig[this.targetSubjectTypeId].totalScore = e.target.value;
+      this.examConfig[this.currentSubjectType].totalScore = e.target.value;
+      console.log("当前试卷配置：", this.examConfig);
     },
     /**
      * 设置题型题数
      */
     getsubjectAmount(e) {
-      this.examConfig[this.targetSubjectTypeId].subjectAmount = e.target.value;
+      this.examConfig[this.currentSubjectType].subjectAmount = e.target.value;
+      console.log("当前试卷配置：", this.examConfig);
     },
     /**
      * 设置试卷相似度
@@ -212,29 +277,38 @@ export default {
         this.customizeStatus = true;
       } else {
         this.similarValue = e.target.value;
-        this.customizeStatus = false; 
+        this.customizeStatus = false;
       }
     },
     /**
      * 选择试卷题型
      */
     chooseSubjectType(checkValue) {
-      this.subjectFeatures = [];
+      let subjectType = this.subjectTypeOptions;
       this.subjectTypeValue = checkValue;
-      this.targetSubjectTypeId = checkValue[checkValue.length - 1];
-      this.examConfig[this.targetSubjectTypeId] = {
-        totalScore: this.subjectScore,
-        subjectAmount: this.subjectAmount,
-        features: this.subjectFeatures
-      };
-      let currentCheckValue = checkValue[checkValue.length - 1];
-      if (currentCheckValue) {
-        for (let i = 0; i < this.subjectTypeOptions.length; i++) {
-          if (currentCheckValue == this.subjectTypeOptions[i].id) {
-            this.subjectTypeName = this.subjectTypeOptions[i].subjectTypeName;
+      this.types = [];
+      // this.subjectFeatures = [];
+      // 获取题型单选组
+      if (checkValue.length) {
+        checkValue.forEach(item => {
+          this.examConfig[item] = {
+            totalScore: this.subjectScore,
+            subjectAmount: this.subjectAmount,
+            features: this.subjectFeatures
+          };
+          for (let i = 0; i < subjectType.length; i++) {
+            if (item == subjectType[i].id) {
+              this.types.push({
+                value: item,
+                name: subjectType[i].subjectTypeName
+              });
+            }
           }
-        }
+        });
+      }else {
+        this.currentSubjectType = ""
       }
+      console.log('当前题型：', this.currentSubjectType)
     },
     /**
      * 获取题目类型
@@ -245,10 +319,9 @@ export default {
       });
     },
     /**
-     * 一键生成
+     * 显示试卷生成模态框
      */
-    quickMake() {
-      let that = this;
+    showMakeModal() {
       if (this.courseId == "") {
         this.$message.warning("请选择试卷的课程范围！");
       } else if (this.examinationName == "") {
@@ -256,55 +329,65 @@ export default {
       } else if (JSON.stringify(this.subjectFeatures) == "[]") {
         this.$message.warning("请选择试卷题型！");
       } else {
-        this.$confirm({
-          title: "试卷生成",
-          cancelText: "取消",
-          centered: true,
-          content: "确定生成该试卷？",
-          onOk() {
-            that.$store.dispatch("ChangeLayoutStatus", {
-              status: true,
-              loadText: "试卷自动生成中..."
-            });
-            let config = {
-              subjectConfigs: that.examConfig
-            };
-            let examInfo = {
-              curriculumId: that.courseId,
-              config: JSON.stringify(config), 
-              correlation: that.similarValue,
-              compareExaminationId: that.examId
-            };
-            autoGenerator(examInfo)
-              .then(autoRes => {
-                let examData = autoRes.data.data;
-                if (examData.isSuccess) {
-                  console.log('自动生成生成！')
-                  let examInfo = {
-                    examinationName: that.examinationName,
-                    examinationData: examData.examinationData
-                  };
-                  saveExamInfo(examInfo).then(examRes => {
-                    that.$store.dispatch("ChangeLayoutStatus", { status: false });
-                    console.log("保存试卷信息结果：". examInfo.data.data)
-                  }).catch(err => {
-                    that.$store.dispatch("ChangeLayoutStatus", { status: false });
-                  })
-                }else {
-                  that.$store.dispatch("ChangeLayoutStatus", { status: false });
-                  that.$message.success(`${examData.message}`);
-                }
-              })
-              .catch(err => {
-                that.$store.dispatch("ChangeLayoutStatus", { status: false });
-              });
-          }
-        });
+        this.examMakeVisible = true;
       }
     },
+    /**
+     * 一键生成
+     */
+    quickMake() {
+      let that = this;
+      that.$store.dispatch("ChangeLayoutStatus", {
+        status: true,
+        loadText: "试卷自动生成中..."
+      });
+      let config = {
+        subjectConfigs: that.examConfig
+      };
+      let examInfo = {
+        curriculumId: that.courseId,
+        config: JSON.stringify(config),
+        correlation: that.similarValue,
+        compareExaminationId: that.examId
+      };
+      autoGenerator(examInfo)
+        .then(autoRes => {
+          let examData = autoRes.data.data;
+          if (examData.isSuccess) {
+            let examInfo = {
+              examinationName: that.examinationName,
+              examinationData: examData.examinationData
+            };
+            saveExamInfo(examInfo)
+              .then(examRes => {
+                that.$store.dispatch("ChangeLayoutStatus", {
+                  status: false
+                });
+                that.examMakeVisible = false;
+                console.log("保存试卷信息结果：".examInfo.data.data);
+              })
+              .catch(err => {
+                that.$store.dispatch("ChangeLayoutStatus", {
+                  status: false
+                });
+              });
+          } else {
+            that.examMakeVisible = false;
+            that.$store.dispatch("ChangeLayoutStatus", { status: false });
+            that.$message.success(`${examData.message}`);
+          }
+        })
+        .catch(err => {
+          that.examMakeVisible = false;
+          that.$store.dispatch("ChangeLayoutStatus", { status: false });
+        });
+    },
+    /**
+     * 获取题型范围
+     */
     onChange(value) {
       this.subjectFeatures = value;
-      this.examConfig[this.targetSubjectTypeId].features = value;
+      this.examConfig[this.currentSubjectType].features = value;
     },
     /**
      * 获取课程信息
@@ -325,6 +408,7 @@ export default {
           this.treeData = currentCourseInfo[i].children;
         }
       }
+      console.log("课程树：", this.treeData);
       this.courseId = courseArea;
     },
     /**
@@ -378,8 +462,17 @@ export default {
     .ant-radio-group {
       flex: 4;
     }
+    .subject_type_content {
+      flex: 4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .ant-radio-group {
+        flex: 2;
+      }
+    }
     .setCourseArea {
-      flex: 2;
+      // flex: 0;
       .type-config {
         display: flex;
         margin: 10px 0;

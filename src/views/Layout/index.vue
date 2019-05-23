@@ -100,8 +100,8 @@
           <div :class="currentPath == '/welcome' ? '' : 'content'">
             <transition
               name="fade"
-              enter-active-class="lightSpeedIn"
-              leave-to-class="flipOutX"
+              enter-active-class="fadeIn"
+              leave-to-class="fadeOut"
               mode="out-in"
             >
               <router-view class="animated"></router-view>
@@ -170,7 +170,7 @@ export default {
           this.$router.push({ path: "/login" });
         }
       });
-    }
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
@@ -180,6 +180,7 @@ export default {
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
+    let that = this
     if (this.$route.path !== "/welcome") {
       this.$router.push({
         name: "welcome"

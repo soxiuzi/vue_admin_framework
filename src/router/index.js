@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import store from '../store'
 import Router from 'vue-router'
+import NProgress from 'nprogress'
 import {
   message
 } from 'ant-design-vue'
@@ -152,8 +153,8 @@ let router = new Router({
     {
       path: '/login',
       name: 'login',
-      mata: {
-        title: '登录'
+      meta: {
+        title: '载入中...'
       },
       component: () => import( /* webpackChunkName: "login" */ '_view/Login')
     }
@@ -161,12 +162,14 @@ let router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  NProgress.start()
   let title = to.meta && to.meta.title
   if(title) {
     document.title = title
   }
   if (store.getters.token) {
     if (to.path == '/login') {
+      NProgress.done()
       next({
         path: '/'
       })
@@ -174,12 +177,18 @@ router.beforeEach((to, from, next) => {
       store.dispatch('GetUserInfo').then().catch(err => {
         message.error("请求出错！")
       })
+      NProgress.done()
       next()
     }
   } else {
+    NProgress.done()
     // console.log('token不存在')
     next()
   }
+})
+
+router.afterEach(() => {
+  NProgress.done()
 })
 
 export default router
