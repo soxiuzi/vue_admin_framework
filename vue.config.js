@@ -23,7 +23,7 @@ module.exports = {
       .set('_com', resolve('src/components'))
       .set('_utils', resolve('src/utils'))
     config.resolve.symlinks(true)
-    config.module.rules.delete("svg")
+    config.module.rules.delete('svg')
     config.module
       .rule('svg-smart')
       .test(/\.svg$/)

@@ -1,10 +1,7 @@
 import Vue from 'vue'
-import store from '../store'
+// import store from '../store'
 import Router from 'vue-router'
-import NProgress from 'nprogress'
-import {
-  message
-} from 'ant-design-vue'
+// import NProgress from 'nprogress'
 
 Vue.use(Router)
 
@@ -12,17 +9,20 @@ Vue.use(Router)
 
 let router = new Router({
   // mode: 'hash',
-  routes: [{
+  routes: [
+    {
       path: '',
       name: 'index',
       redirect: '/welcome',
-      children: [{
+      children: [
+        {
           path: '/welcome',
           name: 'welcome',
           meta: {
             title: '首页'
           },
-          component: () => import( /* webpackChunkName: "welcome" */ '_view/Welcome')
+          component: () =>
+            import(/* webpackChunkName: "welcome" */ '_view/Welcome')
         },
         {
           path: '/coursemanage',
@@ -30,7 +30,8 @@ let router = new Router({
           meta: {
             title: '课程管理'
           },
-          component: () => import( /* webpackChunkName: "coursemanage" */ '_view/CourseManage')
+          component: () =>
+            import(/* webpackChunkName: "coursemanage" */ '_view/CourseManage')
         },
         {
           path: '/majorManage',
@@ -38,7 +39,8 @@ let router = new Router({
           meta: {
             title: '专业管理'
           },
-          component: () => import( /* webpackChunkName: "majormanage" */ '_view/MajorManage')
+          component: () =>
+            import(/* webpackChunkName: "majormanage" */ '_view/MajorManage')
         },
         {
           path: '/teachermanage',
@@ -46,7 +48,8 @@ let router = new Router({
           meta: {
             title: '教师管理'
           },
-          component: () => import( /* webpackChunkName: "teachermanage" */ '_view/TeacherManage')
+          component: () =>
+            import(/* webpackChunkName: "teachermanage" */ '_view/TeacherManage')
         },
         {
           path: '/grademanage',
@@ -54,7 +57,8 @@ let router = new Router({
           meta: {
             title: '年级管理'
           },
-          component: () => import( /* webpackChunkName: "grademanage" */ '_view/GradeManage')
+          component: () =>
+            import(/* webpackChunkName: "grademanage" */ '_view/GradeManage')
         },
         {
           path: '/questionmanage',
@@ -62,7 +66,8 @@ let router = new Router({
           meta: {
             title: '题目管理'
           },
-          component: () => import( /* webpackChunkName: "questionmanage" */ '_view/QuestionManage')
+          component: () =>
+            import(/* webpackChunkName: "questionmanage" */ '_view/QuestionManage')
         },
         {
           path: '/questionimport',
@@ -70,7 +75,8 @@ let router = new Router({
           meta: {
             title: '题目导入'
           },
-          component: () => import( /* webpackChunkName: "questionimport" */ '_view/QuestionImport')
+          component: () =>
+            import(/* webpackChunkName: "questionimport" */ '_view/QuestionImport')
         },
         {
           path: '/questionshare',
@@ -78,7 +84,8 @@ let router = new Router({
           meta: {
             title: '题库共享'
           },
-          component: () => import( /* webpackChunkName: "questionshare" */ '_view/QuestionShare')
+          component: () =>
+            import(/* webpackChunkName: "questionshare" */ '_view/QuestionShare')
         },
         {
           path: '/answermanage',
@@ -86,7 +93,8 @@ let router = new Router({
           meta: {
             title: '答案管理'
           },
-          component: () => import( /* webpackChunkName: "answermanage" */ '_view/AnswerManage')
+          component: () =>
+            import(/* webpackChunkName: "answermanage" */ '_view/AnswerManage')
         },
         {
           path: '/papermanage',
@@ -94,7 +102,8 @@ let router = new Router({
           meta: {
             title: '出题组卷管理'
           },
-          component: () => import( /* webpackChunkName: "papermanage" */ '_view/PaperManage')
+          component: () =>
+            import(/* webpackChunkName: "papermanage" */ '_view/PaperManage')
         },
         {
           path: '/papershare',
@@ -102,7 +111,8 @@ let router = new Router({
           meta: {
             title: '出题组卷共享'
           },
-          component: () => import( /* webpackChunkName: "papershare" */ '_view/PaperShare')
+          component: () =>
+            import(/* webpackChunkName: "papershare" */ '_view/PaperShare')
         },
         {
           path: '/papermake',
@@ -110,7 +120,8 @@ let router = new Router({
           meta: {
             title: '组卷一键生成'
           },
-          component: () => import( /* webpackChunkName: "papermake" */ '_view/PaperMake')
+          component: () =>
+            import(/* webpackChunkName: "papermake" */ '_view/PaperMake')
         },
         {
           path: '/accountmanage',
@@ -118,13 +129,14 @@ let router = new Router({
           meta: {
             title: '账户管理'
           },
-          component: () => import( /* webpackChunkName: "accountmanage" */ '_view/AccountManage')
+          component: () =>
+            import(/* webpackChunkName: "accountmanage" */ '_view/AccountManage')
         }
       ],
       meta: {
         title: '医专在线题库系统'
       },
-      component: () => import( /* webpackChunkName: "home" */ '_view/Layout')
+      component: () => import(/* webpackChunkName: "home" */ '_view/Layout')
     },
     {
       path: '/makeExamination',
@@ -132,7 +144,8 @@ let router = new Router({
       meta: {
         title: '编辑试卷'
       },
-      component: () => import( /* webpackChunkName: "makeExamination" */ '_view/ExaminationMake')
+      component: () =>
+        import(/* webpackChunkName: "makeExamination" */ '_view/ExaminationMake')
     },
     {
       path: '/examinationShow',
@@ -140,7 +153,8 @@ let router = new Router({
       meta: {
         title: '试卷展示'
       },
-      component: () => import( /* webpackChunkName: "examinationshow" */ '_view/ExaminationShow')
+      component: () =>
+        import(/* webpackChunkName: "examinationshow" */ '_view/ExaminationShow')
     },
     {
       path: '/register',
@@ -148,7 +162,8 @@ let router = new Router({
       meta: {
         title: '注册'
       },
-      component: () => import( /* webpackChunkName: "register" */ '_view/Register')
+      component: () =>
+        import(/* webpackChunkName: "register" */ '_view/Register')
     },
     {
       path: '/login',
@@ -156,39 +171,39 @@ let router = new Router({
       meta: {
         title: '载入中...'
       },
-      component: () => import( /* webpackChunkName: "login" */ '_view/Login')
+      component: () => import(/* webpackChunkName: "login" */ '_view/Login')
     }
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  NProgress.start()
-  let title = to.meta && to.meta.title
-  if(title) {
-    document.title = title
-  }
-  if (store.getters.token) {
-    if (to.path == '/login') {
-      NProgress.done()
-      next({
-        path: '/'
-      })
-    } else {
-      store.dispatch('GetUserInfo').then().catch(err => {
-        message.error("请求出错！")
-      })
-      NProgress.done()
-      next()
-    }
-  } else {
-    NProgress.done()
-    // console.log('token不存在')
-    next()
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   NProgress.start()
+//   let title = to.meta && to.meta.title
+//   if (title) {
+//     document.title = title
+//   }
+//   // if (store.getters.token) {
+//   //   if (to.path == '/login') {
+//   //     NProgress.done()
+//   //     next({
+//   //       path: '/'
+//   //     })
+//   //   } else {
+//   //     store.dispatch('GetUserInfo').then().catch(err => {
+//   //       message.error("请求出错！")
+//   //     })
+//   //     NProgress.done()
+//   //     next()
+//   //   }
+//   // } else {
+//   //   NProgress.done()
+//   //   // console.log('token不存在')
+//   //   next()
+//   // }
+// })
 
-router.afterEach(() => {
-  NProgress.done()
-})
+// router.afterEach(() => {
+//   NProgress.done()
+// })
 
 export default router

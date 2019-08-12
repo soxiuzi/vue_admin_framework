@@ -174,40 +174,40 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    if (!this.$store.getters.token) {
-      this.$router.push({ path: "/login" });
-    }
+    // if (!this.$store.getters.token) {
+    //   this.$router.push({ path: "/login" });
+    // }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    let that = this
-    if (this.$route.path !== "/welcome") {
-      this.$router.push({
-        name: "welcome"
-      });
-    }
+    // let that = this
+    // if (this.$route.path !== "/welcome") {
+    //   this.$router.push({
+    //     name: "welcome"
+    //   });
+    // }
   },
   beforeCreate() {
-    setTimeout(() => {
-      if (this.$route.path !== "/welcome") {
-        this.indexPage = true;
-      } else {
-        this.indexPage = false;
-      }
-    }, 200);
+    // setTimeout(() => {
+    //   if (this.$route.path !== "/welcome") {
+    //     this.indexPage = true;
+    //   } else {
+    //     this.indexPage = false;
+    //   }
+    // }, 200);
   }, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
   beforeUpdate() {}, //生命周期 - 更新之前
   updated() {
-    PAGEBREAD.forEach(item => {
-      if (document.title == item.title) {
-        this.currentPage = item.title;
-        this.explain = item.explain;
-      }
-    });
-    if (!this.$store.getters.token) {
-      this.$router.push({ path: "/login" });
-    }
+    // PAGEBREAD.forEach(item => {
+    //   if (document.title == item.title) {
+    //     this.currentPage = item.title;
+    //     this.explain = item.explain;
+    //   }
+    // });
+    // if (!this.$store.getters.token) {
+    //   this.$router.push({ path: "/login" });
+    // }
   }, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
   destroyed() {}, //生命周期 - 销毁完成

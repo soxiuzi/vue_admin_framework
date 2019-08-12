@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <a-layout id="login_layout">
-      <h1>系统载入中......</h1>
+      <h1>登录页</h1>
       <!-- <a-layout-content id="login_content">
         <span class="title">账户登录</span>
         <div class="hr"></div>
@@ -66,9 +66,9 @@ export default {
       //   console.log('注册结果：', res)
       // })
       // 登录
-      loginByUserName(this.username, this.password).then(res => {
-        console.log('登录结果：', res)
-      })
+      // loginByUserName(this.username, this.password).then(res => {
+      //   console.log('登录结果：', res)
+      // })
       // this.$router.push({
       //   name: "index"
       // });
@@ -76,16 +76,16 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    let loginInfo = {
-      url: this.$route.query.targetUrl,
-      ticket: this.$route.query.ticket
-    }
-    let token = this.$store.getters.token;
-    if (!token) {
-      this.$store.dispatch("LoginByUsername", loginInfo).then(res => {
-        res && this.$router.push({ name: "index" });
-      });
-    }
+    // let loginInfo = {
+    //   url: this.$route.query.targetUrl,
+    //   ticket: this.$route.query.ticket
+    // }
+    // let token = this.$store.getters.token;
+    // if (!token) {
+    //   this.$store.dispatch("LoginByUsername", loginInfo).then(res => {
+    //     res && this.$router.push({ name: "index" });
+    //   });
+    // }
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
