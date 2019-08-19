@@ -1,7 +1,7 @@
 <template>
   <div class="welcome">
     <h1>
-      欢迎登陆毕节医学高等专科学校在线题库系统
+      欢迎使用soxiuzi搭建的后台管理系统
     </h1>
   </div>
 </template>
