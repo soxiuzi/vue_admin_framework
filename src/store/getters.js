@@ -7,7 +7,7 @@ const getters = {
   layoutStatus: state => state.loading.layoutStatus,
   loadText: state => state.loading.loadText,
   firstStatus: state => state.loading.firstStatus,
-  secondStatus: state => state.loading.secondStatus
+  permission_routes: state => state.permission.routes
 }
 
 export default getters

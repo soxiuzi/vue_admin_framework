@@ -65,25 +65,7 @@ const user = {
           } else {
             window.location.assign(casStatus.url)
           }
-          // window.location.assign(res.data.data)
-          // console.log('测试登录：', res.data.data)
         })
-        // loginByUserName().then(res => {
-        //   const data = res.data.data
-        //   if (!data.state) {
-        //     loginCas().then(res => {
-        //       console.log('测试登录：', res.data.data)
-        //     })
-        //     // window.location.assign("http://218.201.243.209:8085/cas/login?targetUrl=http://172.16.213.30/#/login")
-        //   } else {
-        //     commit('SET_TOKEN', data.token)
-        //     setLocalStorage('token', data.token, 3)
-        //     message.success("登录成功！")
-        //     resolve(data.state)
-        //   }
-        // }).catch(err => {
-        //   reject(err)
-        // })
       })
     },
 
