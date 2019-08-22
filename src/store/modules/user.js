@@ -69,7 +69,7 @@ const user = {
       })
     },
 
-    //获取用户信息
+    // 获取用户信息
     GetUserInfo({
       commit
     }) {

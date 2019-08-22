@@ -9,22 +9,22 @@ const durationTime = 3 * 1000
 
 let targeUrl = ''
 
-if(process.env.NODE_ENV === devConfig.NODE_ENV) {
+// 根据当前项目环境赋值请求url
+if (process.env.NODE_ENV === devConfig.NODE_ENV) {
   targeUrl = devConfig.requestUrl
-}else if(process.env.NODE_ENV === proConfig.NODE_ENV) {
+} else if (process.env.NODE_ENV === proConfig.NODE_ENV) {
   targeUrl = proConfig.requestUrl
 }
 
-const whiteList = [
-  `${targeUrl}/auth/login`
-]; // 请求白名单
+// 免登陆白名单
+const whiteList = [`${targeUrl}/auth/login`] // 请求白名单
 
 // process.env.NODE_ENV == 'production' ? config.build.env.Base_url : config.dev.env.Base_url
 
 // 创建axios实例
 let service = axios.create({
   // baseURL: 'http://172.16.213.30:8082',
-   baseURL: targeUrl,
+  baseURL: targeUrl,
   // 请求超时时间
   timeout: 50000,
   // 跨域是否需要凭证
@@ -34,16 +34,16 @@ let service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   config => {
-    if(whiteList.indexOf(config.url) < 0) {
+    if (whiteList.indexOf(config.url) < 0) {
       // 白名单以外的URL都需要token凭证进行请求权
       config.headers = {
-        'Authorization': store.getters.token
+        Authorization: store.getters.token
       }
       // 跨域需要凭证
       config.withCredentials = true
-    } 
+    }
     // 设置自定义请求头
-    config.header = { 
+    config.header = {
       'X-Requested-With': 'XMLHttpRequest'
     }
     // 最大重定向数
@@ -75,10 +75,18 @@ service.interceptors.response.use(
             let res = error.response.data
             if (res.code === 500) {
               // 运行时异常
-              message.warning(`运行时异常：${res.code} ${res.message}`, 'error', durationTime)
+              message.warning(
+                `运行时异常：${res.code} ${res.message}`,
+                'error',
+                durationTime
+              )
             } else {
               // 业务异常
-              message.warning(`业务异常: ${res.code} ${res.message}`, 'error', durationTime)
+              message.warning(
+                `业务异常: ${res.code} ${res.message}`,
+                'error',
+                durationTime
+              )
             }
             reject(error)
             break

@@ -49,12 +49,24 @@ export const constantRoutes = [
       title: '404'
     },
     component: () => import(/* webpackChunkName: "404" */ '_view/404')
-  },
+  }
 ]
 
-export default new Router({
-  routes: constantRoutes
-})
+const createRouter = () =>
+  new Router({
+    scrollBehavior: () => ({ y: 0 }),
+    routes: constantRoutes
+  })
+
+const router = createRouter()
+
+// 重置路由表
+export function resetRouter () {
+  const newRouter = createRouter()
+  router.matcher = newRouter.matcher
+}
+
+export default router
 
 export const asyncRoutes = [
   {
@@ -67,7 +79,8 @@ export const asyncRoutes = [
         meta: {
           title: '验权页面'
         },
-        component: () => import(/* webpackChunkName: "Permission" */ '_view/Permission')
+        component: () =>
+          import(/* webpackChunkName: "Permission" */ '_view/Permission')
       }
     ]
   }
