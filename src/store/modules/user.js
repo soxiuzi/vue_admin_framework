@@ -3,25 +3,17 @@ import {
   removeLocalStorage,
   getLocalStorage
 } from '_utils/localStorage.js'
-import {
-  loginByUserName,
-  logOut,
-  loginCas
-} from '_api/login.js'
-import {
-  getUserInfo
-} from '_api/user.js'
-import {
-  message
-} from 'ant-design-vue'
+import { loginByUserName, logOut, loginCas } from '_api/login.js'
+import { getUserInfo } from '_api/user.js'
+import { message } from 'ant-design-vue'
 
 const user = {
   state: {
     token: getLocalStorage('token'),
     roles: [],
     avatar: '',
-    userName: "",
-    userId: ""
+    userName: '',
+    userId: ''
   },
 
   mutations: {
@@ -49,9 +41,7 @@ const user = {
 
   actions: {
     // 用户名登录
-    LoginByUsername({
-      commit
-    }, loginInfo) {
+    LoginByUsername ({ commit }, loginInfo) {
       return new Promise((resolve, reject) => {
         loginCas(loginInfo.url, loginInfo.ticket).then(res => {
           let casStatus = res.data.data
@@ -70,25 +60,30 @@ const user = {
     },
 
     // 获取用户信息
-    GetUserInfo({
-      commit
-    }) {
+    getUserInfo ({ commit }, token) {
       return new Promise((resolve, reject) => {
-        getUserInfo().then(res => {
-          let userInfo = res.data.data
-          commit('SET_USER_NAME', userInfo.username)
-          commit('SET_USER_ID', userInfo.id)
-          resolve(res)
-        }).catch(err => {
-          reject(err)
-        })
+        getUserInfo(token)
+          .then(res => {
+            const { data } = res
+
+            if (!data) {
+              reject('Verification failed, please Login again.')
+            }
+
+            const { name, avatar } = data
+
+            commit('SET_USER_NAME', name)
+            commit('SET_AVATAR', avatar)
+            resolve(data)
+          })
+          .catch(err => {
+            reject(err)
+          })
       })
     },
 
-    //登出
-    LogOut({
-      commit
-    }) {
+    // 登出
+    LogOut ({ commit }) {
       try {
         commit('SET_TOKEN', '')
         removeLocalStorage('token')

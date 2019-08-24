@@ -57,21 +57,9 @@ module.exports = {
   // 相当于webpack-dev-server，对本地服务器进行配置
   devServer: {
     open: true, // 是否自动打开浏览器页面
-    host: '0.0.0.0', // 指定一个host，默认是localhost
+    // host: '0.0.0.0', // 指定一个host，默认是localhost
     port: 8080, // 端口地址
-    https: false, // 使用https服务
-    proxy: {
-      [process.env.VUE_APP_BASE_API]: {
-        target: 'http://127.0.0.1:8080/mock',
-        changeOrigin: true,
-        pathRewrite: {
-          ['^' + process.env.VUE_APP_BASE_API]: ''
-        }
-      }
-    },
-    // 提供在服务器内部的其他中间件之前执行自定义中间件的能力
-    before: app => {},
-    after: require('./mock/mock-server.js')
+    https: false // 使用https服务
   },
 
   // 第三方插件配置

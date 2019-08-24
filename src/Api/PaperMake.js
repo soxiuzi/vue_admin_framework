@@ -1,10 +1,10 @@
-import request from "_utils/request"
+import request from '_utils/request'
 
 /**
  * 试卷自动生成
- * @param {Object} examInfo 
+ * @param {Object} examInfo
  */
-export function autoGenerator(examInfo) {
+export function autoGenerator (examInfo) {
   return request({
     url: '/examination/autoGenerator',
     method: 'POST',
@@ -15,7 +15,7 @@ export function autoGenerator(examInfo) {
 /**
  * 把保存试卷信息
  */
-export function saveExamInfo(examInfo) {
+export function saveExamInfo (examInfo) {
   return request({
     url: '/examination/save',
     method: 'POST',

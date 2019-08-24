@@ -3,7 +3,7 @@ import request from '_utils/request'
 /**
  * 获取题目类型信息
  */
-export function getSubjectType() {
+export function getSubjectType () {
   return request({
     url: '/subject/types',
     method: 'GET'
@@ -13,7 +13,7 @@ export function getSubjectType() {
 /**
  * 新增题目信息
  */
-export function addSubjectInfo(subjectInfo) {
+export function addSubjectInfo (subjectInfo) {
   return request({
     url: '/subject/create',
     method: 'POST',
@@ -24,7 +24,7 @@ export function addSubjectInfo(subjectInfo) {
 /**
  * 分享题目信息
  */
-export function shareSubject() {
+export function shareSubject () {
   return request({
     url: '/subject/share',
     method: 'POST'

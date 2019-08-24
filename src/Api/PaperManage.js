@@ -4,7 +4,7 @@ import request from '_utils/request'
  * 创建试卷
  * @param {String} examinationName 试卷名称
  */
-export function createExamination(examinationName, curriculumId) {
+export function createExamination (examinationName, curriculumId) {
   return request({
     url: '/examination/create',
     method: 'POST',
@@ -21,7 +21,7 @@ export function createExamination(examinationName, curriculumId) {
  * @param {String} examinationId 试卷Id
  * @returns
  */
-export function setExaminationType(subjectId, examinationId) {
+export function setExaminationType (subjectId, examinationId) {
   return request({
     url: '/examination/setupSubjectType',
     method: 'POST',
@@ -36,7 +36,7 @@ export function setExaminationType(subjectId, examinationId) {
  * 设置试卷题目
  * @param {Object} param 试卷信息
  */
-export function setExaminationSubject(param) {
+export function setExaminationSubject (param) {
   return request({
     url: '/examination/setupSubject',
     method: 'POST',
@@ -47,7 +47,7 @@ export function setExaminationSubject(param) {
 /**
  * 获取试卷列表
  */
-export function getExaminatiionList() {
+export function getExaminatiionList () {
   return request({
     url: '/examination/list',
     method: 'GET'
@@ -58,7 +58,7 @@ export function getExaminatiionList() {
  * 获取已设置的试卷题型
  * @param {String} examinationId 试卷Id
  */
-export function getSubjectTypeByExamId(examinationId) {
+export function getSubjectTypeByExamId (examinationId) {
   return request({
     url: `/examination/getSubjectType/${examinationId}`,
     method: 'GET'
@@ -69,7 +69,7 @@ export function getSubjectTypeByExamId(examinationId) {
  * 试卷分享
  * @param {Object} shareInfo
  */
-export function shareExam(shareInfo) {
+export function shareExam (shareInfo) {
   return request({
     url: '/examination/share',
     method: 'POST',

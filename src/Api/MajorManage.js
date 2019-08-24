@@ -3,7 +3,7 @@ import request from '_utils/request.js'
 /**
  * 获取专业树结构
  */
-export function getTreeData() {
+export function getTreeData () {
   return request({
     url: '/professional/tree',
     method: 'GET'
@@ -13,7 +13,7 @@ export function getTreeData() {
 /**
  * 新增专业
  */
-export function addMajor(addMajorInfo) {
+export function addMajor (addMajorInfo) {
   return request({
     url: '/professional/create',
     method: 'POST',
@@ -30,7 +30,7 @@ export function addMajor(addMajorInfo) {
  * 删除专业项
  * @param {String} majorId 专业Id
  */
-export function DeleteMajor(majorId) {
+export function DeleteMajor (majorId) {
   return request({
     url: `/professional/delete/${majorId}`,
     method: 'DELETE'
@@ -41,7 +41,7 @@ export function DeleteMajor(majorId) {
  * 更新专业名称
  * @param {Object} updateInfo 更新信息
  */
-export function UpdateMajorInfo(updateInfo) {
+export function UpdateMajorInfo (updateInfo) {
   return request({
     url: '/professional/update',
     method: 'POST',
@@ -49,11 +49,10 @@ export function UpdateMajorInfo(updateInfo) {
   })
 }
 
-
 /**
  * 获取年级列表
  */
-export function getGradeList() {
+export function getGradeList () {
   return request({
     url: '/grade/list',
     method: 'GET'
@@ -63,7 +62,7 @@ export function getGradeList() {
 /**
  * 获取课程列表
  */
-export function getCourseList(namePart = '', initials = '') {
+export function getCourseList (namePart = '', initials = '') {
   return request({
     url: '/curriculum/list',
     method: 'POST',
@@ -80,7 +79,7 @@ export function getCourseList(namePart = '', initials = '') {
  * @param {String} gradeId 年级Id
  * @returns
  */
-export function getMajorCourse(professionalId, gradeId) { 
+export function getMajorCourse (professionalId, gradeId) {
   return request({
     url: '/professional/getProfessionalCurriculum',
     method: 'POST',
@@ -89,28 +88,28 @@ export function getMajorCourse(professionalId, gradeId) {
       gradeId
     }
   })
- }
+}
 
- /**
+/**
   * 添加专业课程
   * @param {Object} courseInfo
   */
- export function addCourseForMajor(courseInfo) {
-   return request({
-     url:'/professional/setProfessionalCurriculum',
-     method: 'POST',
-     data: courseInfo
-   })
- }
+export function addCourseForMajor (courseInfo) {
+  return request({
+    url: '/professional/setProfessionalCurriculum',
+    method: 'POST',
+    data: courseInfo
+  })
+}
 
- /**
+/**
   * 删除专业课程
   * @param {Object} courseInfo
   */
- export function deleteMajorCourse(courseInfo) {
+export function deleteMajorCourse (courseInfo) {
   return request({
     url: '/professional/removeProfessionalCurriculum',
     method: 'POST',
     data: courseInfo
   })
- }
+}

@@ -24,7 +24,8 @@ const whiteList = [`${targeUrl}/auth/login`] // 请求白名单
 // 创建axios实例
 let service = axios.create({
   // baseURL: 'http://172.16.213.30:8082',
-  baseURL: targeUrl,
+  // baseURL: targeUrl,
+  baseURL: 'http://127.0.0.1',
   // 请求超时时间
   timeout: 50000,
   // 跨域是否需要凭证

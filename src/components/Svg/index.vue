@@ -4,7 +4,6 @@
   </svg>
 </template>
 
-
 <script>
 export default {
   name: 'svg-icon',
@@ -15,10 +14,10 @@ export default {
     },
     className: {
       type: String
-    },
+    }
   },
   methods: {
-    onClick() {
+    onClick () {
       this.$emit('onClick')
     }
   },
@@ -27,7 +26,7 @@ export default {
       return `#icon-${this.iconClass}`
     },
     svgClass () {
-      if(this.className) {
+      if (this.className) {
         return 'svg-icon' + this.className
       } else {
         return 'svg-icon'

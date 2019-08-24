@@ -4,43 +4,43 @@ import request from '_utils/request'
  * 添加课程
  * @param {Object} courseInfo
  */
-export function addCourse(courseInfo) {
+export function addCourse (courseInfo) {
   return request({
-    url: "/curriculum/create",
-    method: "POST",
+    url: '/curriculum/create',
+    method: 'POST',
     data: courseInfo
   })
 }
 
 /**
  * 更新课程
- * @param {Object} courseInfo 
+ * @param {Object} courseInfo
  */
-export function updateCourse(courseInfo) {
+export function updateCourse (courseInfo) {
   return request({
-    url: "/curriculum/update",
-    method: "POST",
+    url: '/curriculum/update',
+    method: 'POST',
     data: courseInfo
   })
 }
 
 /**
  * 删除课程
- * @param {String} courseId 
+ * @param {String} courseId
  */
-export function deleteCourse(courseId) {
+export function deleteCourse (courseId) {
   return request({
     url: `/curriculum/delete/${courseId}`,
-    method: "DELETE"
+    method: 'DELETE'
   })
 }
 
 /**
  * 获取课程树
  */
-export function getCourseTree() {
+export function getCourseTree () {
   return request({
-    url: "/curriculum/tree",
-    method: "GET"
+    url: '/curriculum/tree',
+    method: 'GET'
   })
 }

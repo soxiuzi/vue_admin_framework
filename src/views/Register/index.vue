@@ -18,19 +18,19 @@
 </template>
 
 <script>
-//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-//例如：import 《组件名称》 from '《组件路径》';
-import { register } from "_api/login";
+// 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+// 例如：import 《组件名称》 from '《组件路径》';
+import { register } from '_api/login'
 export default {
-  //import引入的组件需要注入到对象中才能使用
+  // import引入的组件需要注入到对象中才能使用
   components: {},
-  data() {
-    //这里存放数据
+  data () {
+    // 这里存放数据
     return {
-      btnSize: "large",
+      btnSize: 'large',
       userInfo: {
-        username: "", // 用户名
-        password: "" // 密码
+        username: '', // 用户名
+        password: '' // 密码
       },
       labelCol: {
         span: 4,
@@ -39,19 +39,19 @@ export default {
       wrapperCol: {
         span: 4
       }
-    };
+    }
   },
-  //监听属性 类似于data概念
+  // 监听属性 类似于data概念
   computed: {},
-  //监控data中的数据变化
+  // 监控data中的数据变化
   watch: {},
-  //方法集合
+  // 方法集合
   methods: {
-    register() {
+    register () {
       // console.log('用户信息：', this.userInfo)
       // 注册
       register(this.userInfo.username, this.userInfo.password).then(res => {
-        if(res.data.data) {
+        if (res.data.data) {
           this.$message.success('注册成功！')
           this.$router.push({
             name: 'login'
@@ -60,18 +60,18 @@ export default {
       })
     }
   },
-  //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
-  //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
-};
+  // 生命周期 - 创建完成（可以访问当前this实例）
+  created () {},
+  // 生命周期 - 挂载完成（可以访问DOM元素）
+  mounted () {},
+  beforeCreate () {}, // 生命周期 - 创建之前
+  beforeMount () {}, // 生命周期 - 挂载之前
+  beforeUpdate () {}, // 生命周期 - 更新之前
+  updated () {}, // 生命周期 - 更新之后
+  beforeDestroy () {}, // 生命周期 - 销毁之前
+  destroyed () {}, // 生命周期 - 销毁完成
+  activated () {} // 如果页面有keep-alive缓存功能，这个函数会触发
+}
 </script>
 <style lang='scss' scoped>
 //@import url(); 引入公共css类

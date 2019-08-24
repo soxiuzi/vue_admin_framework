@@ -30,5 +30,5 @@ export const PAGEBREAD = [
   {
     title: '智能排课',
     explain: '对课程自动进行排课'
-  },
+  }
 ]

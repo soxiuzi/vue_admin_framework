@@ -3,7 +3,7 @@ import request from '_utils/request.js'
 /**
  * 注册
  */
-export function register(account, password) { 
+export function register (account, password) {
   return request({
     url: '/user/register',
     method: 'POST',
@@ -19,7 +19,7 @@ export function register(account, password) {
 /**
  * 无token时访问
  */
-export function loginCas(targetUrl, ticket) {
+export function loginCas (targetUrl, ticket) {
   return request({
     // url: `/auth/testLoginCAS?targetUrl=http://172.16.213.30/#/login`,
     url: `/auth/testLoginCAS`,
@@ -34,7 +34,7 @@ export function loginCas(targetUrl, ticket) {
 /**
  * 登录
  */
-export function loginByUserName() {
+export function loginByUserName () {
   return request({
     url: '/auth/loginCAS',
     method: 'GET'
@@ -44,14 +44,13 @@ export function loginByUserName() {
 /**
  * 获取用户信息
  */
-export function getUserInfo() {
+export function getUserInfo () {
 
 }
-
 
 /**
  * 登出
  */
-export function logOut() {
-    
+export function logOut () {
+
 }

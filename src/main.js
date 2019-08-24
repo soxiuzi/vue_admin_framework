@@ -18,6 +18,11 @@ Vue.use(animated)
 Vue.use(Antd)
 Vue.use(Print)
 
+if (process.env.NODE_ENV === 'development') {
+  console.log('开发模式')
+  require('../mock/index.js')
+}
+
 if (process.env.NODE_ENV !== 'production') {
   Vue.config.performance = true
 }

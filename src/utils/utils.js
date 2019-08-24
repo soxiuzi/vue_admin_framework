@@ -1,17 +1,17 @@
-const pinyin = require("pinyin")
+const pinyin = require('pinyin')
 
 /**
  * 中文转换成拼音
  * @param {String} chineseStr 中文字符
  */
-export function convertEnglish(chineseStr) {
+export function convertEnglish (chineseStr) {
   let resultEnglishStr = pinyin(chineseStr, {
-    style: pinyin.STYLE_NORMAL,
+    style: pinyin.STYLE_NORMAL
   })
   return resultEnglishStr.join('')
 }
 
-export function getInitialByCourseName(str) {
+export function getInitialByCourseName (str) {
   let initialLetter = pinyin('kecheng', {
     style: pinyin.STYLE_FIRST_LETTER
   })
@@ -23,8 +23,8 @@ export function getInitialByCourseName(str) {
  * 一维数组去重
  * @param {Array} arr 去重数组
  */
-export function filterArrOne(arr) {
-  let result = [];
+export function filterArrOne (arr) {
+  let result = []
   for (let i = 0; i < arr.length; i++) {
     if (result.indexOf(arr[i]) < 0) {
       result.push(arr[i])
@@ -38,11 +38,11 @@ export function filterArrOne(arr) {
  * @param {Array} arr 去重数组
  * @param {String} attribute 判断重复的属性
  */
-export function filterArrOneObj(arr, attribute) {
-  let obj = {};
+export function filterArrOneObj (arr, attribute) {
+  let obj = {}
   let result = arr.reduce(function (item, next) {
     if (!obj[next[attribute]]) {
-      item.push(next);
+      item.push(next)
       obj[next[attribute]] = true
     }
     return item
@@ -55,7 +55,7 @@ export function filterArrOneObj(arr, attribute) {
  * @param {Obj | Array} obj 拷贝对象
  */
 
-export function deepCopy(obj) {
+export function deepCopy (obj) {
   let result = Array.isArray(obj) ? [] : {}
   for (let key in obj) {
     if (typeof obj[key] === 'object') {
